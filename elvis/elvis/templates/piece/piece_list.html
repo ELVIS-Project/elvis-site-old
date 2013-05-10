@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load rest_framework %}
+
+{% block wrap %}
+
+<p> List of pieces </p>
+{% for piece in content %}
+    <a href="{{ piece.url }}">{{ piece.title }}</a>
+{% endfor %}
+
+{% endblock %}
