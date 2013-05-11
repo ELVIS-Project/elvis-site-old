@@ -5,6 +5,7 @@ from MySQLdb.cursors import DictCursor
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "elvis.settings")
 from elvis.models.tag import Tag
 from elvis.models.tag_hierarchy import TagHierarchy
+from elvis.models.composer import Composer
 
 COMPOSERS_QUERY = """SELECT td.tid AS old_id, td.name, dt.field_dates_value AS birth_date,
                       dt.field_dates_value2 AS death_date FROM taxonomy_term_data td
@@ -42,7 +43,17 @@ class DumpDrupal(object):
         self.get_composers()
 
     def get_composers(self):
-        pass
+        self.curs.execute(COMPOSERS_QUERY)
+        composers = self.curs.fetchall()
+
+        print "Deleting composer objects"
+        Composer.objects.all().delete()
+
+        print "Adding composers"
+        for composer in composers:
+            c = Composer(**composer)
+            c.save()
+
 
     def get_tags(self):
         self.curs.execute(TAG_QUERY)
@@ -51,6 +62,7 @@ class DumpDrupal(object):
         print "Deleting all tags"
         Tag.objects.all().delete()
 
+        print "Adding tags"
         for tag in tags:
             t = Tag(**tag)
             t.save()
@@ -58,10 +70,10 @@ class DumpDrupal(object):
         print "Deleting tag hierarchy"
         TagHierarchy.objects.all().delete()
 
+        print "Adding tag hierarchy"
         self.curs.execute(TAG_HIERARCHY_QUERY)
         tag_hierarchy = self.curs.fetchall()
         for t in tag_hierarchy:
-            print t.get("tid")
             tag = Tag.objects.get(old_id=t.get('tid', None))
             if not t.get('parent') == 0:
                 parent = Tag.objects.get(old_id=t.get('parent', None))
