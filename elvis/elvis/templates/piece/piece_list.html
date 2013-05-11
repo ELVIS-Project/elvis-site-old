@@ -4,8 +4,10 @@
 {% block wrap %}
 
 <p> List of pieces </p>
+<ul>
 {% for piece in content %}
-    <a href="{{ piece.url }}">{{ piece.title }}</a>
+    <li><a href="{{ piece.url }}">{{ piece.title }}</a></li>
 {% endfor %}
+</ul>
 
 {% endblock %}
