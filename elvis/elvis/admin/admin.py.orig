@@ -3,8 +3,13 @@ from django.contrib import admin
 from elvis.models.piece import Piece
 from elvis.models.corpus import Corpus
 from elvis.models.composer import Composer
+<<<<<<< HEAD
+from elvis.models.movement import Movement
+=======
 from elvis.models.tag import Tag
 from elvis.models.tag_hierarchy import TagHierarchy
+
+>>>>>>> 87ac5028d2742b674f5436c0f26f37edeb9d38d0
 
 class PieceAdmin(admin.ModelAdmin):
     pass
@@ -17,6 +22,21 @@ class CorpusAdmin(admin.ModelAdmin):
 # Can display CSS here
 
 class ComposerAdmin(admin.ModelAdmin):
+<<<<<<< HEAD
+	def upper_case_name(obj): return ("%s" % (obj.name)).upper()
+	
+	upper_case_name.short_description = 'name'
+
+	list_display = ("name", "birth_date", "death_date")
+
+	#list_display = (upper_case_name,)
+
+
+class MovementAdmin(admin.ModelAdmin):
+	pass
+
+# Indicates that these objects have admin interface 
+=======
     list_display = ("name", "birth_date", "death_date")
 
 
@@ -27,6 +47,7 @@ class TagAdmin(admin.ModelAdmin):
 class TagHierarchyAdmin(admin.ModelAdmin):
     list_display = ("tag", "parent")
 
+>>>>>>> 87ac5028d2742b674f5436c0f26f37edeb9d38d0
 
 admin.site.register(TagHierarchy, TagHierarchyAdmin)
 admin.site.register(Piece, PieceAdmin)
