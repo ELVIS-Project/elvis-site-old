@@ -8,11 +8,11 @@ from elvis.models.piece import Piece
 
 
 class PieceListHTMLRenderer(CustomHTMLRenderer):
-    template_name = "pieces/piece_list.html"
+    template_name = "piece/piece_list.html"
 
 
 class PieceDetailHTMLRenderer(CustomHTMLRenderer):
-    template_name = "pieces/piece_detail.html"
+    template_name = "piece/piece_detail.html"
 
 
 class PieceList(generics.ListCreateAPIView):
