@@ -897,8 +897,12 @@
     <!-- Alright, alright! I'll make a field called text!! -->
     <field name="text" type="text_general" indexed="true" stored="false" multiValued="true"/>
 
+    <field name="composer_name" type="string" indexed="true" stored="true" />
+    <field name="composer_birth" type="date" indexed="true" stored="true" />
+    <field name="composer_death" type="date" indexed="true" stored="true" />
+
     <!-- piece fields -->
-    <field name="piece_id" type="string" indexed="true" stored="true" />
+<!--     <field name="piece_id" type="string" indexed="true" stored="true" />
     <field name="book_title" type="string" indexed="true" stored="true" />
     <field name="book_id" type="int" indexed="true" stored="true" />
     <field name="book_id_title" type="string" indexed="true" stored="false" />
@@ -906,7 +910,6 @@
     <field name="composer" type="string" indexed="true" stored="true" />
     <field name="pdf_link" type="string" indexed="true" stored="true" />
 
-    <!-- analysis fields -->
     <field name="analysis_id" type="int" indexed="true" stored="true" />
     <field name="contributor" type="string" indexed="true" stored="true" />
     <field name="phrase_number" type="int" indexed="true" stored="true" />
@@ -926,7 +929,7 @@
     <field name="earlier_phrase" type="string" indexed="true" stored="true" />
     <field name="comment" type="text_general" indexed="true" stored="true" />
     <field name="repeat_exact_varied" type="string" indexed="true" stored="true" />
-    <!-- Rather than define a field for each voice field, we'll create dynamic fields for those types -->
+    Rather than define a field for each voice field, we'll create dynamic fields for those types
     <dynamicField name="voice_*" type="string" indexed="true" stored="true"/>
     <dynamicField name="voices_*" type="string" indexed="true" stored="true"/>
 
@@ -938,7 +941,7 @@
     <copyField source="book_title" dest="tg_book_title"/>
     <copyField source="book_title" dest="tg_fr_book_title"/>
     <copyField source="title" dest="tg_piece_title"/>
-    <copyField source="title" dest="tg_fr_piece_title"/>
+    <copyField source="title" dest="tg_fr_piece_title"/> -->
 
 <!--    <field name="sku" type="text_en_splitting_tight" indexed="true" stored="true" omitNorms="true"/>
    <field name="name" type="text_general" indexed="true" stored="true"/>
@@ -1039,7 +1042,7 @@
       Unless this field is marked with required="false", it will be a required field
    -->
  <uniqueKey>id</uniqueKey>
- <defaultSearchField>tg_piece_title</defaultSearchField>
+ <defaultSearchField>text</defaultSearchField>
  <solrQueryParser defaultOperator="AND"/>
 
 </schema>
