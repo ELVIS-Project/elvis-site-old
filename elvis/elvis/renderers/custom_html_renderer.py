@@ -2,8 +2,6 @@ from rest_framework.renderers import TemplateHTMLRenderer
 
 
 class CustomHTMLRenderer(TemplateHTMLRenderer):
-    template_name = "pieces/piece_list.html"
-
     def render(self, data, accepted_media_type=None, renderer_context=None):
         """
         Renders data to HTML, using Django's standard template rendering.
