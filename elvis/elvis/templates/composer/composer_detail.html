@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block wrap %}
+
+<!-- {'content': {'url': 'http://localhost:8000/composer/1/', 'old_id': 9, 'name': u'CompGuy', 'birth_date': datetime.date(2013, 5, 1), 'death_date': datetime.date(2013, 5, 31)}}
+-->
+
+<h2> {{ content.name }} </h2>
+<h4> {{ content.birth_date }} - {{ content.death_date }} </h4>
+
+{% endblock %}

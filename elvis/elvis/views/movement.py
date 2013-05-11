@@ -8,11 +8,11 @@ from elvis.models.movement import Movement
 
 
 class MovementListHTMLRenderer(CustomHTMLRenderer):
-    template_name = "corpus/corpus_list.html"
+    template_name = "movement/movement_list.html"
 
 
 class MovementDetailHTMLRenderer(CustomHTMLRenderer):
-    template_name = "corpus/corpus_detail.html"
+    template_name = "movement/movement_detail.html"
 
 
 class MovementList(generics.ListCreateAPIView):

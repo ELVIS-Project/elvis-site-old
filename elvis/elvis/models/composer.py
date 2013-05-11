@@ -7,5 +7,8 @@ class Composer(models.Model):
     birth_date = models.DateField()
     death_date = models.DateField()
 
+    def __unicode__(self):
+    	return u"{0}".format(self.name)
+
     class Meta:
         app_label = "elvis"
