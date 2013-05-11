@@ -40,6 +40,14 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('elvis', ['Movement'])
 
+        # Adding M2M table for field tags on 'Movement'
+        db.create_table(u'elvis_movement_tags', (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('movement', models.ForeignKey(orm['elvis.movement'], null=False)),
+            ('tag', models.ForeignKey(orm['elvis.tag'], null=False))
+        ))
+        db.create_unique(u'elvis_movement_tags', ['movement_id', 'tag_id'])
+
         # Adding M2M table for field attachments on 'Movement'
         db.create_table(u'elvis_movement_attachments', (
             ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
@@ -62,6 +70,14 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('elvis', ['Piece'])
 
+        # Adding M2M table for field tags on 'Piece'
+        db.create_table(u'elvis_piece_tags', (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('piece', models.ForeignKey(orm['elvis.piece'], null=False)),
+            ('tag', models.ForeignKey(orm['elvis.tag'], null=False))
+        ))
+        db.create_unique(u'elvis_piece_tags', ['piece_id', 'tag_id'])
+
         # Adding M2M table for field attachments on 'Piece'
         db.create_table(u'elvis_piece_attachments', (
             ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
@@ -80,6 +96,23 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('elvis', ['Composer'])
 
+        # Adding model 'Tag'
+        db.create_table(u'elvis_tag', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('old_id', self.gf('django.db.models.fields.IntegerField')()),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('description', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
+        ))
+        db.send_create_signal('elvis', ['Tag'])
+
+        # Adding model 'TagHierarchy'
+        db.create_table(u'elvis_taghierarchy', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('tag', self.gf('django.db.models.fields.related.ForeignKey')(related_name='in_hierarchy', to=orm['elvis.Tag'])),
+            ('parent', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='has_hierarchy', null=True, to=orm['elvis.Tag'])),
+        ))
+        db.send_create_signal('elvis', ['TagHierarchy'])
+
 
     def backwards(self, orm):
         # Deleting model 'Attachment'
@@ -91,17 +124,29 @@ class Migration(SchemaMigration):
         # Deleting model 'Movement'
         db.delete_table(u'elvis_movement')
 
+        # Removing M2M table for field tags on 'Movement'
+        db.delete_table('elvis_movement_tags')
+
         # Removing M2M table for field attachments on 'Movement'
         db.delete_table('elvis_movement_attachments')
 
         # Deleting model 'Piece'
         db.delete_table(u'elvis_piece')
 
+        # Removing M2M table for field tags on 'Piece'
+        db.delete_table('elvis_piece_tags')
+
         # Removing M2M table for field attachments on 'Piece'
         db.delete_table('elvis_piece_attachments')
 
         # Deleting model 'Composer'
         db.delete_table(u'elvis_composer')
+
+        # Deleting model 'Tag'
+        db.delete_table(u'elvis_tag')
+
+        # Deleting model 'TagHierarchy'
+        db.delete_table(u'elvis_taghierarchy')
 
 
     models = {
@@ -173,6 +218,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'number_of_voices': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'old_id': ('django.db.models.fields.IntegerField', [], {}),
+            'tags': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['elvis.Tag']", 'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'uploader': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
         },
@@ -186,21 +232,22 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'number_of_voices': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'old_id': ('django.db.models.fields.IntegerField', [], {}),
+            'tags': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['elvis.Tag']", 'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'uploader': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
         },
-        u'taggit.tag': {
+        'elvis.tag': {
             'Meta': {'object_name': 'Tag'},
+            'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '100'}),
-            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '100'})
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'old_id': ('django.db.models.fields.IntegerField', [], {})
         },
-        u'taggit.taggeditem': {
-            'Meta': {'object_name': 'TaggedItem'},
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "u'taggit_taggeditem_tagged_items'", 'to': u"orm['contenttypes.ContentType']"}),
+        'elvis.taghierarchy': {
+            'Meta': {'object_name': 'TagHierarchy'},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'object_id': ('django.db.models.fields.IntegerField', [], {'db_index': 'True'}),
-            'tag': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "u'taggit_taggeditem_items'", 'to': u"orm['taggit.Tag']"})
+            'parent': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'has_hierarchy'", 'null': 'True', 'to': "orm['elvis.Tag']"}),
+            'tag': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'in_hierarchy'", 'to': "orm['elvis.Tag']"})
         }
     }
 
