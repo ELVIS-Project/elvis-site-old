@@ -1,7 +1,17 @@
 {% extends "base.html" %}
 
-{% block wrap%}
+{% block wrap %}
 
-<h1>{{ content.composer.name }}</h1>
+<!-- {'content': {'url': 'http://localhost:8000/piece/1/', 'composer': {'url': 'http://localhost:8000/composer/1/', 'old_id': 9, 'name': u'CompGuy', 'birth_date': datetime.date(2013, 5, 1), 'death_date': datetime.date(2013, 5, 31)}, 'old_id': 1, 'title': u'Piece1', 'uploader': 'http://localhost:8000/user/1/', 'corpus': 'http://localhost:8000/corpus/1/', 'date_of_composition': datetime.date(2013, 5, 11), 'number_of_voices': 4, 'comment': u'', 'attachments': []}}
+--> 
+
+<h2> {{ content.title }} : {{ content.date_of_composition }} </h2>
+<h4> <a href="{{ content.composer.url }}"> {{ content.composer.name }} </a> </h4> 
+<h5> Uploaded by <a href="{{ content.uploader }}" > this user </a> </h5>
+<h5> From <a href="{{ content.corpus }} "> this corpus </a> </h5>
+<h5> {{ content.number_of_voices }} voices </h5>
+<h5> <i> Comments: </i> {{ content.comment }} </h5>
+<h5> <i> Attachments: </i> {{ content.attachments }} </h5>
+
 
 {% endblock %}

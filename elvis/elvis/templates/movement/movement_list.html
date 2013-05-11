@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load rest_framework %}
+
+{% block wrap %}
+
+<p> List of movements </p>
+<ul>
+{% for movement in content %}
+    <li><a href="{{ movement.url }}">{{ movement.title }}</a></li>
+{% endfor %}
+</ul>
+
+{% endblock %}

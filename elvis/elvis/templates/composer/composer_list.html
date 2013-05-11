@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load rest_framework %}
+
+{% block wrap %}
+
+<p> List of composers </p>
+<ul>
+{% for composer in content %}
+    <li><a href="{{ composer.url }}">{{ composer.name }}</a></li>
+{% endfor %}
+</ul>
+
+{% endblock %}
