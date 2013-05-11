@@ -1,5 +1,4 @@
 from django.db import models
-from taggit.managers import TaggableManager
 from django.contrib.auth.models import User
 
 
@@ -11,7 +10,7 @@ class Movement(models.Model):
     composer = models.ForeignKey("elvis.Composer")
     date_of_composition = models.DateField(blank=True, null=True)
     number_of_voices = models.IntegerField(blank=True, null=True)
-    tags = TaggableManager()
+    tags = models.ManyToManyField("elvis.Tag", blank=True, null=True)
     attachments = models.ManyToManyField("elvis.Attachment", blank=True, null=True)
     comment = models.TextField(blank=True, null=True)
 
