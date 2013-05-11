@@ -16,7 +16,7 @@ class CorpusAdmin(admin.ModelAdmin):
 
 
 class ComposerAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("name", "birth_date", "death_date")
 
 
 class TagAdmin(admin.ModelAdmin):
