@@ -9,6 +9,7 @@ from elvis.views.corpus import CorpusList, CorpusDetail
 from elvis.views.user import UserList, UserDetail
 from elvis.views.movement import MovementList, MovementDetail
 from elvis.views.composer import ComposerList, ComposerDetail
+from elvis.views.tag import TagList, TagDetail
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -29,6 +30,8 @@ urlpatterns += format_suffix_patterns(
         url(r'^composer/(?P<pk>[0-9]+)/$', ComposerDetail.as_view(), name="composer-detail"),
         url(r'^movements/$', MovementList.as_view(), name="movement-list"),
         url(r'^movement/(?P<pk>[0-9]+)/$', MovementDetail.as_view(), name="movement-detail"),
+        url(r'^tags/$', TagList.as_view(), name="tag-list"),
+        url(r'^tag/(?P<pk>[0-9]+)/$', TagDetail.as_view(), name="tag-detail"),
     )
 )
 
