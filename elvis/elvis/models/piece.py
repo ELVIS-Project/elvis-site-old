@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 
 class Piece(models.Model):
-    old_id = models.IntegerField()
+    old_id = models.IntegerField(db_index=True)
     title = models.CharField(max_length=255)
     uploader = models.ForeignKey(User, blank=True, null=True)
     corpus = models.ForeignKey("elvis.Corpus", blank=True, null=True)
