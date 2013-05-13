@@ -218,7 +218,9 @@ class DumpDrupal(object):
         self.__disconnect()
 
         print "Tagging pieces"
+        # filters out composers (tid 3)
         PIECE_TAG_QUERY = """SELECT ti.nid, ti.tid FROM taxonomy_index ti
+                             LEFT JOIN taxonomy_term_data td ON td.tid = ti.tid
                              WHERE ti.nid = %s"""
 
         pieces = Piece.objects.all()
@@ -263,8 +265,7 @@ class DumpDrupal(object):
                 filepath = os.path.join(old_file_path, filename)
                 f = open(filepath, 'rb')
 
-                attached_file = os.path.join(a.attachment_path, filename)
-                print "attached file: {0}".format(attached_file)
+                # attached_file = os.path.join(a.attachment_path, filename)
                 s = {
                     'uploader': user_obj,
                     'description': attachment.get('description', None),
@@ -280,8 +281,6 @@ class DumpDrupal(object):
                 piece.attachments.add(a)
 
         self.__disconnect()
-
-
 
 if __name__ == "__main__":
     x = DumpDrupal()
