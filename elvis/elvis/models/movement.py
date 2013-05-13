@@ -7,6 +7,7 @@ class Movement(models.Model):
     title = models.CharField(max_length=255)
     uploader = models.ForeignKey(User, blank=True, null=True)
     piece = models.ForeignKey("elvis.Piece", blank=True, null=True)
+    corpus = models.ForeignKey("elvis.Corpus", blank=True, null=True)
     composer = models.ForeignKey("elvis.Composer", blank=True, null=True)
     date_of_composition = models.DateField(blank=True, null=True)
     number_of_voices = models.IntegerField(blank=True, null=True)
