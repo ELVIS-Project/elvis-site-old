@@ -34,7 +34,7 @@ class Attachment(models.Model):
     def upload_path(self, filename):
         return os.path.join(self.attachment_path, filename)
 
-    old_id = models.IntegerField(null=True, blank=True)
+    old_id = models.IntegerField(null=True, blank=True, db_index=True)
     attachment = models.FileField(upload_to=upload_path, null=True, max_length=512)
     uploader = models.ForeignKey(User, blank=True, null=True)
     description = models.CharField(max_length=255, blank=True, null=True)

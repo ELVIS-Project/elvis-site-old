@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Composer(models.Model):
-    old_id = models.IntegerField()
+    old_id = models.IntegerField(db_index=True)
     name = models.CharField(max_length=255)
     birth_date = models.DateField(blank=True, null=True)
     death_date = models.DateField(blank=True, null=True)

@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Tag(models.Model):
-    old_id = models.IntegerField()
+    old_id = models.IntegerField(db_index=True)
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
 
