@@ -10,8 +10,5 @@ class Composer(models.Model):
     def __unicode__(self):
         return u"{0}".format(self.name)
 
-    def __unicode__(self):
-    	return u"{0}".format(self.name)
-
     class Meta:
         app_label = "elvis"
