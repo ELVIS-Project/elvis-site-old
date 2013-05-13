@@ -10,7 +10,7 @@ class Piece(models.Model):
     composer = models.ForeignKey("elvis.Composer", db_index=True, blank=True, null=True)
     date_of_composition = models.DateField(blank=True, null=True)
     number_of_voices = models.IntegerField(blank=True, null=True)
-    tags = models.ManyToManyField("elvis.Tag", blank=True, null=True)
+    tags = models.ManyToManyField("elvis.Tag", blank=True, null=True, related_name="pieces")
     attachments = models.ManyToManyField("elvis.Attachment", blank=True, null=True)
     comment = models.TextField(blank=True, null=True)
 
