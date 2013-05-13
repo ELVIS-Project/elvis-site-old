@@ -14,6 +14,8 @@ from elvis.models.piece import Piece
 from elvis.models.attachment import Attachment
 from elvis.models.movement import Movement
 
+DRUPAL_FILE_PATH = ""  # path to the old drupal files.
+
 ELVIS_USERS = """SELECT DISTINCT u.uid, u.name, u.mail, u.created, u.access, u.login FROM users u
                 LEFT JOIN users_roles ur ON u.uid = ur.uid
                 LEFT JOIN role r ON ur.rid = r.rid
@@ -24,7 +26,7 @@ COMPOSERS_QUERY = """SELECT td.tid AS old_id, td.name, dt.field_dates_value AS b
                      LEFT JOIN field_data_field_dates dt on td.tid = dt.entity_id
                      WHERE td.vid = 3"""
 
-PIECE_QUERY = """SELECT rv.title, cp.field_composer_tid AS composer_id, rv.nid AS old_id,
+PIECE_MOVEMENT_QUERY = """SELECT rv.title, cp.field_composer_tid AS composer_id, rv.nid AS old_id,
                  rv.uid AS uploader, fd.field_date_value AS date_of_composition,
                  fv.field_voices_value AS number_of_voices, fc.field_comment_value AS comment,
                  n.created AS created, n.changed AS updated, b.bid AS book_id FROM node n
@@ -34,22 +36,13 @@ PIECE_QUERY = """SELECT rv.title, cp.field_composer_tid AS composer_id, rv.nid A
                   LEFT JOIN field_data_field_voices fv ON (fv.revision_id = rv.vid)
                   LEFT JOIN field_data_field_comment fc ON (fc.revision_id = rv.vid)
                   LEFT JOIN book b ON (n.nid = b.nid)
-                  WHERE n.type=\"piece\""""
+                  WHERE n.type=\"{0}\""""
 
-CORPUS_QUERY = """SELECT rv.title, rv.nid AS old_id, rv.uid AS creator, cc.field_corpus_comment_value AS comment FROM node n
+CORPUS_QUERY = """SELECT rv.title, rv.nid AS old_id, rv.uid AS creator, cc.field_corpus_comment_value AS comment,
+                  n.created AS created, n.changed AS updated FROM node n
                   LEFT JOIN node_revision rv ON (n.vid = rv.vid)
                   LEFT JOIN field_revision_field_corpus_comment cc ON (cc.revision_id = n.vid)
                   WHERE n.type=\"corpus\""""
-
-MOVEMENT_QUERY = """SELECT rv.title, cp.field_composer_tid AS composer_id, n.nid AS old_id,
-                 rv.uid AS uploader, fd.field_date_value AS date_of_composition,
-                 fv.field_voices_value AS number_of_voices, fc.field_comment_value AS comment FROM node n
-                  LEFT JOIN node_revision rv ON (n.vid = rv.vid)
-                  LEFT JOIN field_data_field_composer cp ON (rv.vid = cp.revision_id)
-                  LEFT JOIN field_data_field_date fd ON (fd.revision_id = rv.vid)
-                  LEFT JOIN field_data_field_voices fv ON (fv.revision_id = rv.vid)
-                  LEFT JOIN field_data_field_comment fc ON (fc.revision_id = rv.vid)
-                  WHERE n.type=\"movement\""""
 
 TAG_QUERY = """SELECT td.name, td.description, td.tid AS old_id FROM taxonomy_term_data td"""
 
@@ -60,14 +53,12 @@ ATTACHMENT_QUERY = """"""
 
 class DumpDrupal(object):
     def __init__(self):
-        # curs.execute(PIECE_QUERY)
-        # curs.execute(TAG_QUERY)
-        # pieces = curs.fetchall()
         self.get_tags()
         self.get_composers()
-        # self.get_users()
+        self.get_users()
         self.get_corpus()
-        self.get_pieces()
+        self.get_pieces_movements("piece")
+        self.get_pieces_movements("movement")
 
     def __connect(self):
         self.conn = MySQLdb.connect(host="localhost", user="root", cursorclass=DictCursor, db="ddmal_elvis")
@@ -103,11 +94,13 @@ class DumpDrupal(object):
                     u = User.objects.get(username=user.get('name'))
                     break
             corp['creator'] = u
+
+            corp['created'] = datetime.datetime.fromtimestamp(corp['created'])
+            corp['updated'] = datetime.datetime.fromtimestamp(corp['updated'])
             x = Corpus(**corp)
             x.save()
 
         self.__disconnect()
-
 
     def get_users(self):
         conn = MySQLdb.connect(host="localhost", user="root", cursorclass=DictCursor, db="ddmal_drupal")
@@ -177,78 +170,104 @@ class DumpDrupal(object):
     def get_attachments(self):
         self.curs.execute(ATTACHMENT_QUERY)
 
-    def get_pieces(self):
+    def get_pieces_movements(self, rettype):
         users = self.__get_ddmal_users()
-
+        query = PIECE_MOVEMENT_QUERY.format(rettype)
         self.__connect()
-        self.curs.execute(PIECE_QUERY)
-        pieces = self.curs.fetchall()
+        self.curs.execute(query)
 
-        print "Deleting Pieces"
-        Piece.objects.all().delete()
+        objects = self.curs.fetchall()
 
-        print "Adding Pieces"
-        for piece in pieces:
-            composer_obj = Composer.objects.get(old_id=piece['composer_id'])
+        print "Deleting {0}".format(rettype)
+        if rettype == "piece":
+            Piece.objects.all().delete()
+        elif rettype == "movement":
+            Movement.objects.all().delete()
+
+        print "Adding {0}".format(rettype)
+        for item in objects:
+            composer_obj = Composer.objects.get(old_id=item['composer_id'])
             for user in users:
-                if piece.get('uploader') == user.get('uid'):
+                if item.get('uploader') == user.get('uid'):
                     user_obj = User.objects.get(username=user.get('name'))
                     break
 
-            corpus_obj = Corpus.objects.filter(old_id=piece['book_id'])
-            if not corpus_obj.exists():
-                corpus_obj = None
-            else:
-                corpus_obj = corpus_obj[0]
+            if rettype == "piece":
+                parent_obj = Corpus.objects.filter(old_id=item['book_id'])
+                if not parent_obj.exists():
+                    parent_obj = None
+                else:
+                    parent_obj = parent_obj[0]
+            elif rettype == "movement":
+                parent_obj = self.__resolve_movement_parent(item['old_id'])
+                corpus_obj = Corpus.objects.filter(old_id=item['book_id'])
+                if not corpus_obj.exists():
+                    corpus_obj = None
+                else:
+                    corpus_obj = corpus_obj[0]
 
             p = {
                 'uploader': user_obj,
-                'corpus': corpus_obj,
                 'composer': composer_obj,
-                'old_id': piece.get('old_id', None),
-                'title': piece.get('title', None),
-                'date_of_composition': piece.get('date_of_composition', None),
-                'number_of_voices': piece.get('number_of_voices', None),
-                'comment': piece.get('comment', None),
-                'created': datetime.datetime.fromtimestamp(piece.get('created')),
-                'updated': datetime.datetime.fromtimestamp(piece.get('updated'))
+                'old_id': item.get('old_id', None),
+                'title': item.get('title', None),
+                'date_of_composition': item.get('date_of_composition', None),
+                'number_of_voices': item.get('number_of_voices', None),
+                'comment': item.get('comment', None),
+                'created': datetime.datetime.fromtimestamp(item.get('created')),
+                'updated': datetime.datetime.fromtimestamp(item.get('updated'))
             }
-            x = Piece(**p)
+
+            if rettype == "piece":
+                p.update({'corpus': parent_obj})
+                x = Piece(**p)
+            elif rettype == "movement":
+                p.update({'piece': parent_obj, 'corpus': corpus_obj})
+                x = Movement(**p)
             x.save()
         self.__disconnect()
 
-        print "Tagging pieces"
+        print "Tagging {0}".format(rettype)
         # filters out composers (tid 3)
-        PIECE_TAG_QUERY = """SELECT ti.nid, ti.tid FROM taxonomy_index ti
+        ITEM_TAG_QUERY = """SELECT ti.nid, ti.tid FROM taxonomy_index ti
                              LEFT JOIN taxonomy_term_data td ON td.tid = ti.tid
                              WHERE ti.nid = %s"""
 
-        pieces = Piece.objects.all()
+        if rettype == "piece":
+            objects = Piece.objects.all()
+        elif rettype == "movement":
+            objects = Movement.objects.all()
 
-        for piece in pieces:
+        for item in objects:
             self.__connect()
-            self.curs.execute(PIECE_TAG_QUERY, piece.old_id)
+            self.curs.execute(ITEM_TAG_QUERY, item.old_id)
             tags = self.curs.fetchall()
             for tag in tags:
                 tag_obj = Tag.objects.filter(old_id=tag.get('tid'))
                 if not tag_obj.exists():
                     continue
-                piece.tags.add(tag_obj[0])
-                piece.save()
+                item.tags.add(tag_obj[0])
+                item.save()
 
             self.__disconnect()
 
-        PIECE_ATTACHMENT_QUERY = """SELECT ff.field_files_description AS description, fm.timestamp AS created,
+        ITEM_ATTACHMENT_QUERY = """SELECT ff.field_files_description AS description, fm.timestamp AS created,
                                     fm.uid AS uploader, fm.filename AS filename, fm.uri AS uri FROM field_data_field_files ff
                                     LEFT JOIN file_managed fm ON ff.field_files_fid = fm.fid
                                     WHERE ff.entity_id = %s"""
-        print "Attaching files"
-        pieces = Piece.objects.all()
+
+        print "Attaching files to {0}".format(rettype)
+        if rettype == "piece":
+            objects = Piece.objects.all()
+        elif rettype == "movement":
+            objects = Movement.objects.all()
+
+        print "Deleting attachments"
         Attachment.objects.all().delete()
-        old_file_path = ""  # path to the old drupal files.
+
         self.__connect()
-        for piece in pieces:
-            self.curs.execute(PIECE_ATTACHMENT_QUERY, piece.old_id)
+        for item in objects:
+            self.curs.execute(ITEM_ATTACHMENT_QUERY, item.old_id)
             attachments = self.curs.fetchall()
             for attachment in attachments:
                 for user in users:
@@ -262,7 +281,7 @@ class DumpDrupal(object):
                 # filename = attachment.get('filename')[9:]  # lop the 'public://' off.
                 filename = "test_file.mei"  # for testing.
 
-                filepath = os.path.join(old_file_path, filename)
+                filepath = os.path.join(DRUPAL_FILE_PATH, filename)
                 f = open(filepath, 'rb')
 
                 # attached_file = os.path.join(a.attachment_path, filename)
@@ -278,9 +297,27 @@ class DumpDrupal(object):
                 a.attachment.save(filename, File(f))
                 a.save()
                 f.close()
-                piece.attachments.add(a)
+                item.attachments.add(a)
 
         self.__disconnect()
+
+    def __resolve_movement_parent(self, old_id):
+        q = """SELECT REPLACE(ml1.link_path, 'node/', '') AS parent_nid,
+               REPLACE(ml2.link_path, 'node/', '') AS nid
+               FROM menu_links ml1
+               LEFT JOIN menu_links ml2 ON ml2.plid = ml1.mlid
+               WHERE ml2.link_path = \"node/%s\""""
+        self.curs.execute(q, old_id)
+        pp = self.curs.fetchone()
+        # import pdb
+        # pdb.set_trace()
+        if not pp:
+            return None
+        parent_obj = Piece.objects.filter(old_id=pp['parent_nid'])
+        if parent_obj.exists():
+            return parent_obj[0]
+        else:
+            return None
 
 if __name__ == "__main__":
     x = DumpDrupal()
