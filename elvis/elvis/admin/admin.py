@@ -11,6 +11,7 @@ from elvis.models.attachment import Attachment
 class PieceAdmin(admin.ModelAdmin):
     list_display = ("title", "composer", "date_of_composition", "number_of_voices", "uploader", "old_id", "corpus")
     filter_horizontal = ("tags",)
+    readonly_fields = ("attachments",)
 
 class CorpusAdmin(admin.ModelAdmin):
     pass
