@@ -127,7 +127,6 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     "elvis",
     "south",
-    "taggit",
     'rest_framework',
     'rest_framework.authtoken',
     'debug_toolbar',
