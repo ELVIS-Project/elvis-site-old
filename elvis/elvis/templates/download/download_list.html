@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load rest_framework %}
+
+{% block wrap %}
+
+<p>Download Page</p>
+
+{% if content %}
+
+	{% with total=content|length %}
+	<h4> You have {{ total }} files {{ total|pluralize }} saved for download. </h4>
+	{% endwith %}
+
+	<ul>
+		{% for download_item in content %}
+   		<li> <a href="{{ download_item.url }}">item link</a></li>
+   		</ul>
+		{% endfor %}
+	</ul>
+
+	<!-- this has to do something different from other form, download files immediately --> 
+	<button type="submit" value="Download" class="btn btn-primary"><i class="icon-download-alt"></i>Download now</button>
+
+	<p>Note that selecting a composer or corpus will download all the pieces/movements associated with that selection. </p>
+	</form>
+{% else %}
+	Your download cart is empty.
+{% endif %}
+
+{% endblock %}

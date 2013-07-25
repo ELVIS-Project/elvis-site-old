@@ -3,11 +3,21 @@
 
 {% block wrap %}
 
-<p> List of Corpora </p>
-<ul>
-{% for corpus in content %}
-    <li><a href="{{ corpus.url }}">{{ corpus.title }}</a></li>
-{% endfor %}
-</ul>
+<p> static: {{ static_url }} </p>
+
+{% if content %}
+	{% if content|length = 1 %}
+		<h4> 1 corpus found: </h4>
+	{% else %}
+	<h4> {{ content|length }} corpora found: </h4>
+	{% endif %}
+	<ul>
+	{% for corpus in content %}
+    	<li><a href="{{ corpus.url }}">{{ corpus.title }}</a></li>
+	{% endfor %}
+	</ul>
+{% else %}
+	No corpora found.
+{% endif %}
 
 {% endblock %}

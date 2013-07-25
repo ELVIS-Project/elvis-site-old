@@ -61,7 +61,7 @@ class DumpDrupal(object):
         self.get_pieces_movements("movement")
 
     def __connect(self):
-        self.conn = MySQLdb.connect(host="localhost", user="root", cursorclass=DictCursor, db="ddmal_elvis")
+        self.conn = MySQLdb.connect(host="localhost", user="root", passwd="salvisql", cursorclass=DictCursor, db="ddmal_elvis")
         self.curs = self.conn.cursor()
 
     def __disconnect(self):
@@ -69,7 +69,7 @@ class DumpDrupal(object):
         self.conn.close()
 
     def __get_ddmal_users(self):
-        conn = MySQLdb.connect(host="localhost", user="root", cursorclass=DictCursor, db="ddmal_drupal")
+        conn = MySQLdb.connect(host="localhost", user="root", passwd="salvisql", cursorclass=DictCursor, db="ddmal_drupal")
         curs = conn.cursor()
 
         curs.execute(ELVIS_USERS)
@@ -103,7 +103,7 @@ class DumpDrupal(object):
         self.__disconnect()
 
     def get_users(self):
-        conn = MySQLdb.connect(host="localhost", user="root", cursorclass=DictCursor, db="ddmal_drupal")
+        conn = MySQLdb.connect(host="localhost", user="root", passwd="salvisql", cursorclass=DictCursor, db="ddmal_drupal")
         curs = conn.cursor()
 
         curs.execute(ELVIS_USERS)

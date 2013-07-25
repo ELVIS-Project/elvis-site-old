@@ -3,11 +3,19 @@
 
 {% block wrap %}
 
-<p> List of pieces </p>
-<ul>
-{% for piece in content %}
-    <li><a href="{{ piece.url }}">{{ piece.title }}</a></li>
-{% endfor %}
-</ul>
+{% if content %}
+	{% if content|length = 1 %}
+		<h4> 1 piece found: </h4>
+	{% else %}
+	<h4> {{ content|length }} pieces found: </h4>
+	{% endif %}
+	<ul>
+	{% for piece in content %}
+    	<li><a href="{{ piece.url }}">{{ piece.title }}</a></li>
+	{% endfor %}
+	</ul>
+{% else %}
+	There are no pieces. 
+{% endif %}
 
 {% endblock %}

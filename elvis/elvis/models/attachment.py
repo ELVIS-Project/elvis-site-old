@@ -5,6 +5,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
 
+from datetime import datetime
 
 class Attachment(models.Model):
     """
@@ -39,8 +40,10 @@ class Attachment(models.Model):
     uploader = models.ForeignKey(User, blank=True, null=True)
     description = models.CharField(max_length=255, blank=True, null=True)
 
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
+    #created = models.DateTimeField(auto_now_add=True)
+    #updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(default=datetime.now, blank=True)
+    updated = models.DateTimeField(default=datetime.now, blank=True)
 
     def save(self, *args, **kwargs):
         super(Attachment, self).save(*args, **kwargs)
