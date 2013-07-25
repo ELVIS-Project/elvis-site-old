@@ -3,11 +3,19 @@
 
 {% block wrap %}
 
-<p> List of movements </p>
-<ul>
-{% for movement in content %}
-    <li><a href="{{ movement.url }}">{{ movement.title }}</a></li>
-{% endfor %}
-</ul>
+{% if content %}
+	{% if content|length = 1 %}
+		<h4> 1 movement found: </h4>
+	{% else %}
+		<h4> {{ content|length }} movements found: </h4>
+	{% endif %}
+	<ul>
+	{% for movement in content %}
+    	<li><a href="{{ movement.url }}">{{ movement.title }}</a></li>
+	{% endfor %}
+	</ul>
+{% else %}
+	No movements found.
+{% endif %}
 
 {% endblock %}

@@ -7,11 +7,12 @@
 
 <h2> {{ content.title }} : {{ content.date_of_composition }} </h2>
 <h4> <a href="{{ content.composer.url }}"> {{ content.composer.name }} </a> </h4> 
-<h5> Uploaded by <a href="{{ content.uploader }}" > this user </a> </h5>
-<h5> From <a href="{{ content.corpus }}"> this corpus </a> </h5>
+<h5> Uploaded by <a href="{{ content.uploader }}" > {{ content.uploader.name }} </a> </h5>
+<h5> From <a href="{{ content.corpus }}"> {{ content.corpus.title }} </a> </h5>
 <h5> {{ content.number_of_voices }} voices </h5>
 <h5> <i> Comments: </i> {{ content.comment }} </h5>
+<!--
 <h5> <i> Attachments: </i> {{ content.attachments }} </h5>
-
+-->
 
 {% endblock %}

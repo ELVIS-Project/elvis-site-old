@@ -5,13 +5,12 @@
 <!-- content: url, composer:{url, old_id, name, birth_date, death_date}, old_id, title, uploader, corpus, date_of_composition, number_of_voices, comment, attachments -->
 
 <h2> {{ content.title }} : {{ content.date_of_composition }} </h2>
-<h4> <a href="{{ content.composer.name }}">Composer </a></h4>
+<h4> <a href="{{ content.composer.name }}">{{ content.composer.name }} </a></h4>
 
-<h6> Uploaded by <a href="{{ content.uploader }}"> this user </a> </h6>
-<h6> From <a href="{{ content.corpus }}"> this corpus </a> </h6>
+<h6> Uploaded by <a href="{{ content.uploader }}"> {{ content.uploader.name }}</a> </h6>
+<h6> From <a href="{{ content.corpus }}"> {{ content.corpus.title }} </a> </h6>
 <h6> {{ content.number_of_voices }} voices </h6>
 <h6> Comments: {{ content.comment }} </h6>
-<h6> Attachments: {{ content.attachments }} </h6>
-
+<h6> Attachments: <a href="{{ content.attachments }}">see all</a> </h6>
 
 {% endblock %}
