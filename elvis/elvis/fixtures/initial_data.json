@@ -5,7 +5,7 @@
   "fields": {
     "name":"New Elvis Website",
     "description": "The goal is to create a more user-friendly website for elvis users equipped with better search/upload/download capabilities and a more aesthetic interface.",
-    "users":[400,480,5000,5003,5005]
+    "users":[400,480,5005]
   }
 },
 {
@@ -110,7 +110,7 @@
   "model":"elvis.todo",
   "pk":9972,
   "fields": {
-    "description": "Research Waller's experience with women, focusing on those with tarsal incongruities",
+    "description": "Research Waller's experience with women, focusing on those with metatarsal incongruities",
     "project": 997,
     "assigned_to": 43
   }
