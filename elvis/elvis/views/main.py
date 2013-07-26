@@ -47,7 +47,6 @@ def project_view(request, pk):
     todos = Todo.objects.filter(project_id=pk)
     discussions = Discussion.objects.filter(project_id=pk)
     comments = {}
-    users = {}
     for discussion in discussions:
         comments[discussion.id] = Comment.objects.filter(discussion_id=discussion.id).order_by('-created')
     context = {'content':project, 
@@ -56,6 +55,20 @@ def project_view(request, pk):
                 'comments':comments}
     return render(request, 'project/project_detail.html', context)
 
+def project_participants(request, pk):
+    project = Project.objects.filter(pk=pk)[0]
+    return render(request, 'project/project_participants.html', {"content": project})
+
+def project_discussions(request, pk):
+    project = Project.objects.filter(pk=pk)[0]
+    discussions = Discussion.objects.filter(project_id=pk)
+    num_comments = {}
+    for discussion in discussions:
+        num_comments[discussion.id] = Comment.objects.filter(discussion_id=discussion.id).count()
+    context = {"project": project, 
+                "discussions": discussions,
+                "comments": num_comments}
+    return render(request, 'project/project_discussions.html', context)
 
 # Used across html files to save items to download later
 # TODO: How to get current user? 

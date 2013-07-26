@@ -12,6 +12,8 @@ from elvis.views.main import user_profiles
 from elvis.views.main import user_view
 from elvis.views.main import projects_list
 from elvis.views.main import project_view
+from elvis.views.main import project_participants
+from elvis.views.main import project_discussions
 
 from elvis.views.search import search
 from elvis.views.search import search_results
@@ -46,6 +48,8 @@ urlpatterns += format_suffix_patterns(
 
         url(r'^projects/$', projects_list, name="projects-list"),
         url(r'^projects/(?P<pk>[0-9]+)/$', project_view, name="project-detail"),
+        url(r'^projects/(?P<pk>[0-9]+)/participants$', project_participants, name="project-participants"),
+        url(r'^projects/(?P<pk>[0-9]+)/discussions$', project_discussions, name="project-discussions"),
 
         url(r'^pieces/$', PieceList.as_view(), name="piece-list"),
         url(r'^piece/(?P<pk>[0-9]+)/$', PieceDetail.as_view(), name="piece-detail"),
