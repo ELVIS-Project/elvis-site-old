@@ -87,7 +87,7 @@ function toggle_comments(counter) {
 	margin-top:20px;
 }
 
-#participant, #discussion, #attachment, #todo {
+#participant, #discussion, #attachment, #todos {
 	margin-top:6px;
 	text-align:center;
 	text-decoration:underline;
@@ -124,6 +124,7 @@ function toggle_comments(counter) {
 #discussion-name {
 	font-weight:bold;
 	text-decoration:underline;
+	font-size:1.1em;
 }
 
 #comment {
@@ -133,6 +134,10 @@ function toggle_comments(counter) {
 #create-time {
 	font-size:.82em;
 	color:#606060;
+}
+
+#todo {
+	font-size:1.2em;
 }
 
 </style>
@@ -151,7 +156,7 @@ function toggle_comments(counter) {
 		<div class="span2" id="participant">
 			<p> <a class="stat-link" href="#">{{ content.users.all | length }} Participants </a></p>
 		</div>
-		<div class="span2" id="todo">
+		<div class="span2" id="todos">
 			<p> <a class="stat-link" href="#">{{ todos | length }} Todos </a></p>
 		</div>
 		<div class="span2" id="discussion">
@@ -207,6 +212,20 @@ function toggle_comments(counter) {
 		{% endwith %}
 	</div>
 	{% endfor %}
+
+	<div class="row-fluid">
+		<p class="title"> Todos </i></p>
+		<ul>
+		{% for todo in todos %}
+			<li id="todo"><input type="checkbox"/>{{ todo.description }}</li>
+		{% endfor %}
+		</ul>
+	</div>
+
+	<div class="row-fluid">
+		<p class="title"> Attachments </i></p>
+	</div>
+
 </div>
 <div class="container-fluid" id="separator-activity">
 	
