@@ -164,7 +164,9 @@
   "pk":770,
   "fields": {
     "name": "How serious is Fats Waller in his song?",
-    "project": 997
+    "project": 997,
+    "first_comment": "In his song 'Feets Too Big', Fats Waller seems very alarmed and provoked by the girthy mass of an unknown woman's feet. It would be interesting to see others' opinions on whether or not he is serious about this phobia.",
+    "first_user": 5006
   }
 },
 {
@@ -172,7 +174,9 @@
   "pk":771,
   "fields": {
     "name": "Is Fats male or female?",
-    "project": 997
+    "project": 997,
+    "first_comment": "I think I know the answer to this question...but I might be wrong, what do you guys think?",
+    "first_user": 5007
   }
 },
 {
@@ -180,7 +184,7 @@
   "pk":7701,
   "fields": {
     "text": "I think he's really f*cking serious. When he says 'yo feets too big', it's easy to hear comical overtones but there's a deep longing for small feet.",
-    "user": 5008,
+    "user": 5000,
     "discussion":770
   }
 },
@@ -189,7 +193,7 @@
   "pk":7702,
   "fields": {
     "text": "The line where he states that there are 4 people at the table suggests how aware he is of the feets' presence. Theyre not just an appendage of the woman, they are truly their own entities. In Fats' mind, the role of these characters should be a subtle one, and when the feet are too big, he's overwhelmed and resorts to drinking, as is clear in the enunciation of his singing.",
-    "user": 5008,
+    "user": 5000,
     "discussion":770
   }
 },
@@ -198,7 +202,7 @@
   "pk":7711,
   "fields": {
     "text": "I think it's likely that FAts is male, although its unclear by his first name, and last name for that matter. Often it is said he found his company with women, and they were naked.",
-    "user": 5008,
+    "user": 5000,
     "discussion":771
   }
 },
