@@ -44,7 +44,7 @@ def projects_list(request):
 
 def project_view(request, pk):
     project = Project.objects.filter(pk=pk)[0]
-    todos = Todo.objects.all()
+    todos = Todo.objects.filter(project_id=pk)
     discussions = Discussion.objects.filter(project_id=pk)
     comments = {}
     users = {}
