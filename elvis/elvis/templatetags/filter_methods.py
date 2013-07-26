@@ -10,13 +10,10 @@ Or can use decorator (@register.filter).
 '''
 
 @register.filter
-def get_comments(comments, key):
-	try:
-		comment_set = comments[key]
-		return comment_set
-		#return """<li> {% for comment in comment_set %} {{ comment.text }} {% endfor %} </li>"""
-	except KeyError:
-		return None
+def assign_id(name, counter): return str(name)+str(counter)
+
+@register.filter
+def get_comments(comments, key): return comments.get(key)
 
 @register.filter
 def format_time(timestamp):
@@ -25,7 +22,7 @@ def format_time(timestamp):
 	if today == timestamp:
 		return "just now"
 	elif today.day == timestamp.day and today.month == timestamp.month and today.year == timestamp.year:
-		return timestamp.time
+		return timestamp.time()
 	elif today.year == timestamp.year and today.month == timestamp.month:
 		return timestamp.strftime("%d %b")
 	elif today.year == timestamp.year:
