@@ -56,6 +56,7 @@ def project_view(request, pk):
                 'comments':comments}
     return render(request, 'project/project_detail.html', context)
 
+
 # Used across html files to save items to download later
 # TODO: How to get current user? 
 def save_downloads(request):
