@@ -70,15 +70,19 @@
                     <a class="brand" href="#">ELVIS</a>
                     <div class="nav-collapse collapse">
                         <ul class="nav">
-                            <li class="active"><a href="#">Home</a></li>
-                            <li><a href="#">About</a></li>
-                            <li><a href="projects">Projects</a></li>
-                            <li><a href="#">Forum</a></li>
-                            <li id="separator"><a href="userprofiles">Everyone</a></li>
+                            {% with about="/about/" %}{% with projects="/projects/" %}{% with everyone="/userprofiles/" %}
+                            <li><a href="#">Home</a></li>
+                            <li><a href="{{about}}">About</a></li>
+                            <li><a href="{{projects}}">Projects</a></li>
+                            <li><a href="#">Queries</a></li>
+                            <li id="separator"><a href="{{everyone}}">Everyone</a></li>
                             <li><a href="#">Me</a></li>
+                            {% endwith %}{% endwith %}{% endwith %}
                         </ul>
                         <p class="navbar-text pull-right">
+                            {% with downloads="/downloads/" %}
                             <a href="downloads"><i class="icon-download"></i></a>
+                            {% endwith %}
                             <a href="#">Login</a>
                         </p>
                     </div>
@@ -94,7 +98,8 @@
                     <table class="table table-hover">
                         <tr>
                             <td class="dropdown">
-                                <a class="model-link" href="search" class="dropdown-toggle" data-toggle="dropdown">Search</a>
+                                {% with search="/search/" %}{% with upload="/upload/" %}
+                                <a class="model-link" href="{{search}}" class="dropdown-toggle" data-toggle="dropdown">Search</a>
                                 <ul class="dropdown-menu">
                                     <li>example</li>
                                     <li>example</li>
@@ -102,25 +107,28 @@
                             </td>
                         </tr>
                         <tr>
-                            <td><a class="model-link" href="upload">Upload</a></td>
+                            <td><a class="model-link" href="{{upload}}">Upload</a></td>
                         </tr>
+                        {% endwith %}{% endwith %}
                     </table>
                     <table class="table table-hover">
+                        {% with corpora="/corpora/" %}{% with composers="/composers/" %}{% with pieces="/pieces/" %}{% with movements="/movements/" %}
                         <tr>
                             <thead>View all:</thead>
                         </tr>
                         <tr>
-                            <td><a class="model-link" href="corpora">Corpora</a></td>
+                            <td><a class="model-link" href="{{corpora}}">Corpora</a></td>
                         </tr>
                         <tr>
-                            <td><a class="model-link" href="composers">Composers</a></td>
+                            <td><a class="model-link" href="{{composers}}">Composers</a></td>
                         </tr>
                         <tr>
-                            <td><a class="model-link" href="pieces">Pieces</a></td>
+                            <td><a class="model-link" href="{{pieces}}">Pieces</a></td>
                         </tr>
                         <tr>
-                            <td><a class="model-link" href="movements">Movements</a></td>
+                            <td><a class="model-link" href="{{movements}}">Movements</a></td>
                         </tr>
+                        {% endwith %}{% endwith %}{% endwith %}{% endwith %}
                     </table>
                 </div>
                 <div class="span10" id="main-frame">

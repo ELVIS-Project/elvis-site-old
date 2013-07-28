@@ -186,11 +186,12 @@ function toggle_comments(counter) {
 		{% endwith %}
 
 		{% with comment_set=comments|get_comments:discussion.id %}
+		{% with proj="/projects/" %} {% with disc="/discussions/" %}
 		<div class="span2" id="num-comments">
 			{% if comment_set|length = 1 %}
-				<a href="#">{{ comment_set|length }} comment <!--<i class="icon-arrow-right"></i>--></a></div>
+				<a href="{{proj}}{{content.id}}{{disc}}{{discussion.id}}" class="pull-right">{{ comment_set|length }} comment <!--<i class="icon-arrow-right"></i>--></a></div>
 			{% else %}
-				<a href="#">{{ comment_set|length }} comments <!--<i class="icon-arrow-right"></i>--></a></div>
+				<a href="{{proj}}{{content.id}}{{disc}}{{discussion.id}}" class="pull-right">{{ comment_set|length }} comments <!--<i class="icon-arrow-right"></i>--></a></div>
 			{% endif %}
 
 		{% with name="toggleComments" %}
@@ -213,7 +214,8 @@ function toggle_comments(counter) {
 		          	</tr>  
 		        </tbody>
 		    </table>
-
+		    <a href="{{proj}}{{content.id}}{{disc}}{{discussion.id}}" class="pull-right">See all </a>
+		    {% endwith %} {% endwith %}
 		</div>
 		{% endwith %}
 	</div>
