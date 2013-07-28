@@ -14,6 +14,8 @@ from elvis.views.main import projects_list
 from elvis.views.main import project_view
 from elvis.views.main import project_participants
 from elvis.views.main import project_discussions
+from elvis.views.main import discussion_view
+from elvis.views.main import search_view
 
 from elvis.views.search import search
 from elvis.views.search import search_results
@@ -50,6 +52,7 @@ urlpatterns += format_suffix_patterns(
         url(r'^projects/(?P<pk>[0-9]+)/$', project_view, name="project-detail"),
         url(r'^projects/(?P<pk>[0-9]+)/participants$', project_participants, name="project-participants"),
         url(r'^projects/(?P<pk>[0-9]+)/discussions$', project_discussions, name="project-discussions"),
+        url(r'^projects/(?P<pk>[0-9]+)/discussions/(?P<did>[0-9]+)$', discussion_view, name="project-discussions"),
 
         url(r'^pieces/$', PieceList.as_view(), name="piece-list"),
         url(r'^piece/(?P<pk>[0-9]+)/$', PieceDetail.as_view(), name="piece-detail"),
@@ -61,8 +64,9 @@ urlpatterns += format_suffix_patterns(
         url(r'^movement/(?P<pk>[0-9]+)/$', MovementDetail.as_view(), name="movement-detail"),
         url(r'^tags/$', TagList.as_view(), name="tag-list"),
         url(r'^tag/(?P<pk>[0-9]+)/$', TagDetail.as_view(), name="tag-detail"),
+
         url(r'^search/$', search, name="search"),
-        url(r'^search_results/$', search_results, name="search_results"),
+        url(r'^search_results/$', search_view, name="search_results"),
         url(r'^upload/$', upload, name="upload"),
 
         url(r'^downloads/$', DownloadList.as_view(), name="download-list"),
