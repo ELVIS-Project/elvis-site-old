@@ -183,7 +183,7 @@
   "model":"elvis.comment",
   "pk":7701,
   "fields": {
-    "text": "I think he's really f*cking serious. When he says 'yo feets too big', it's easy to hear comical overtones but there's a deep longing for small feet.",
+    "text": "I think he's really serious. When he says 'yo feets too big', it's easy to hear comical overtones but there's a deep longing for small feet.",
     "user": 5000,
     "discussion":770
   }
@@ -553,9 +553,10 @@
     "pk": 1,
     "fields": {
       "old_id": 1,
-      "creator": 41,
+      "creator": 410,
       "title": "JazzCorpus",
-      "comment": "First corpus created because I love jazzy things."
+      "comment": "First corpus created because I love jazzy things.",
+      "picture": "jazz.png"
     }
   },
   {
@@ -563,9 +564,10 @@
     "pk": 2,
     "fields": {
       "old_id": 1,
-      "creator": 40,
+      "creator": 400,
       "title": "SwingCorpus",
-      "comment": "People love to swing dance."
+      "comment": "People love to swing dance.",
+      "picture": "swing.png"
     }
   },
    {
@@ -573,7 +575,10 @@
     "pk": 3,
     "fields": {
       "old_id": 3,
-      "name": "Art Tatum"
+      "name": "Art Tatum",
+      "birth_date": "1930-08-21",
+      "death_date": "1990-10-10",
+      "picture":"art_tatum.png"
     }
   },
   {
@@ -583,7 +588,8 @@
       "old_id": 4,
       "name": "Felonious Sphere Monk",
       "birth_date": "1917-10-10",
-      "death_date": "1982-02-17"
+      "death_date": "1982-02-17",
+      "picture": "thelonious.png"
     }
   },
   {
@@ -593,7 +599,8 @@
       "old_id": 5,
       "name": "Miles Davis",
       "birth_date": "1926-05-26",
-      "death_date": "1991-09-28"
+      "death_date": "1991-09-28",
+      "picture": "miles.png"
     }
   },
   {
@@ -603,7 +610,8 @@
       "old_id": 6,
       "name": "Caravan Palace",
       "birth_date": "1926-05-26",
-      "death_date": "2013-08-18"
+      "death_date": "2013-08-18",
+      "picture": "caravan.png"
     }
   },
   {
@@ -613,7 +621,8 @@
       "old_id": 7,
       "name": "Parov Stelar",
       "birth_date": "1990-10-14",
-      "death_date": "2013-10-10"
+      "death_date": "2013-10-10",
+      "picture": "parov.png"
     }
   },
   {
@@ -623,7 +632,8 @@
       "old_id": 8,
       "name": "Frank Sinatra",
       "birth_date": "1915-12-12",
-      "death_date": "1998-05-14"
+      "death_date": "1998-05-14",
+      "picture": "frank_sinatra.png"
     }
   },
   {

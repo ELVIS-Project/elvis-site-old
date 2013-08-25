@@ -8,14 +8,13 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from elvis.views.main import home
 from elvis.views.main import upload
 from elvis.views.main import save_downloads
-from elvis.views.main import user_profiles
-from elvis.views.main import user_view
-from elvis.views.main import projects_list
-from elvis.views.main import project_view
-from elvis.views.main import project_participants
-from elvis.views.main import project_discussions
-from elvis.views.main import discussion_view
-from elvis.views.main import search_view
+from elvis.views.main import user_profiles, user_view
+from elvis.views.main import projects_list, project_view, project_participants, project_discussions, discussion_view
+from elvis.views.main import search_view, queries
+from elvis.views.main import corpora_list, corpus_view
+from elvis.views.main import composer_list, composer_view
+from elvis.views.main import piece_list, piece_view
+from elvis.views.main import movement_list, movement_view
 
 from elvis.views.search import search
 from elvis.views.search import search_results
@@ -29,6 +28,9 @@ from elvis.views.movement import MovementList, MovementDetail
 from elvis.views.composer import ComposerList, ComposerDetail
 from elvis.views.tag import TagList, TagDetail
 from elvis.views.attachment import AttachmentList, AttachmentDetail
+
+from elvis.views.forms import create_composer, create_corpus
+from elvis.views.forms import upload_file
 
 
 # Uncomment the next two lines to enable the admin:
@@ -54,20 +56,35 @@ urlpatterns += format_suffix_patterns(
         url(r'^projects/(?P<pk>[0-9]+)/discussions$', project_discussions, name="project-discussions"),
         url(r'^projects/(?P<pk>[0-9]+)/discussions/(?P<did>[0-9]+)$', discussion_view, name="project-discussions"),
 
-        url(r'^pieces/$', PieceList.as_view(), name="piece-list"),
-        url(r'^piece/(?P<pk>[0-9]+)/$', PieceDetail.as_view(), name="piece-detail"),
-        url(r'^corpora/$', CorpusList.as_view(), name="corpus-list"),
-        url(r'^corpus/(?P<pk>[0-9]+)/$', CorpusDetail.as_view(), name="corpus-detail"),
-        url(r'^composers/$', ComposerList.as_view(), name="composer-list"),
-        url(r'^composer/(?P<pk>[0-9]+)/$', ComposerDetail.as_view(), name="composer-detail"),
-        url(r'^movements/$', MovementList.as_view(), name="movement-list"),
-        url(r'^movement/(?P<pk>[0-9]+)/$', MovementDetail.as_view(), name="movement-detail"),
+        #url(r'^pieces/$', PieceList.as_view(), name="piece-list"),
+        #url(r'^piece/(?P<pk>[0-9]+)/$', PieceDetail.as_view(), name="piece-detail"),
+        #url(r'^corpora/$', CorpusList.as_view(), name="corpus-list"),
+        #url(r'^corpus/(?P<pk>[0-9]+)/$', CorpusDetail.as_view(), name="corpus-detail"),
+        #url(r'^composers/$', ComposerList.as_view(), name="composer-list"),
+        #url(r'^composer/(?P<pk>[0-9]+)/$', ComposerDetail.as_view(), name="composer-detail"),
+        #url(r'^movements/$', MovementList.as_view(), name="movement-list"),
+        #url(r'^movement/(?P<pk>[0-9]+)/$', MovementDetail.as_view(), name="movement-detail"),
+
+        url(r'^pieces/$', piece_list, name="piece-list"),
+        url(r'^pieces/(?P<pk>[0-9]+)/$', piece_view, name="piece-detail"),
+        url(r'^corpora/$', corpora_list, name="corpus-list"),
+        url(r'^corpora/(?P<pk>[0-9]+)/$', corpus_view, name="corpus-detail"),
+        url(r'^composers/$', composer_list, name="composer-list"),
+        url(r'^composers/(?P<pk>[0-9]+)/$', composer_view, name="composer-detail"),
+        url(r'^movements/$', movement_list, name="movement-list"),
+        url(r'^movements/(?P<pk>[0-9]+)/$', movement_view, name="movement-detail"),
+        
         url(r'^tags/$', TagList.as_view(), name="tag-list"),
         url(r'^tag/(?P<pk>[0-9]+)/$', TagDetail.as_view(), name="tag-detail"),
 
         url(r'^search/$', search, name="search"),
         url(r'^search_results/$', search_view, name="search_results"),
-        url(r'^upload/$', upload, name="upload"),
+        url(r'^upload/$', upload_file, name="upload"),
+
+        url(r'^queries/$', queries, name="queries"),
+
+        url(r'^addcomposer/$', create_composer, name="create-composer"),
+        url(r'^addcorpus/$', create_corpus, name="create-corpus"),
 
         url(r'^downloads/$', DownloadList.as_view(), name="download-list"),
         url(r'^download/(?P<pk>[0-9]+)/$', DownloadDetail.as_view(), name="download-detail"),

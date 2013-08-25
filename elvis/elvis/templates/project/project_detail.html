@@ -185,7 +185,7 @@ function toggle_comments(counter) {
 		<a id="{{name|assign_id:forloop.counter}}" href="javascript:toggle_comments({{forloop.counter}});"><div class="span10" id="discussion-name">{{ discussion.name }}</div></a>
 		{% endwith %}
 
-		{% with comment_set=comments|get_comments:discussion.id %}
+		{% with comment_set=comments|get_value:discussion.id %}
 		{% with proj="/projects/" %} {% with disc="/discussions/" %}
 		<div class="span2" id="num-comments">
 			{% if comment_set|length = 1 %}

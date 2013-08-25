@@ -1,11 +1,149 @@
 {% extends "base.html" %}
+{% load rest_framework %}
+{% load filter_methods %}
 
 {% block wrap %}
 
-<!-- {'content': {'url': 'http://localhost:8000/composer/1/', 'old_id': 9, 'name': u'CompGuy', 'birth_date': datetime.date(2013, 5, 1), 'death_date': datetime.date(2013, 5, 31)}}
--->
+<style type="text/css">
 
-<h2> {{ content.name }} </h2>
-<h4> {{ content.birth_date }} - {{ content.death_date }} </h4>
+#main-result-frame {
+	-moz-box-shadow: 0 0 5px #888;
+	-webkit-box-shadow: 0 0 5px#888;
+	box-shadow: 0 0 5px #888;
+	margin-left:50px;
+	margin-right:50px;
+	margin-top:20px;
+}
+
+.composer-picture {
+	width:230px;
+	height:150;
+	overflow:hidden;
+}
+
+.header {
+	margin-top:20px;
+}
+
+.composer-name {
+	font-size:2em;
+	font-weight:bold;
+}
+
+.composer-dates {
+	font-size:1.1em;
+	font-weight:bold;
+	color:#A0A0A0;
+	margin-top:5px;
+}
+
+#creator-name {
+	color:#808080;
+	text-decoration:underline;
+}
+
+#check {
+	margin-right:3px;
+	margin-bottom:5px;
+}
+
+.icon-download, .icon-download-alt {
+	margin-left:4px;
+	margin-right:10px;
+}
+
+#submit-row {
+	margin-top:50px;
+	text-align:center;
+}
+
+.edit {
+	margin-top:4px;
+}
+
+.edit,.delete {
+	font-size:.9em;
+	text-decoration:underline;
+}
+.icon-pencil,.icon-remove {
+	margin-right:3px;
+}
+
+.dostuff {
+    border: .3em solid #FFFFFF;
+    height: 4em;
+    width: 5em;
+    text-align: center;
+    background:#FFFFFF;
+    -moz-box-shadow: 0 0 5px #888;
+	-webkit-box-shadow: 0 0 5px#888;
+	box-shadow: 0 0 5px #888;
+}
+
+</style>
+
+<div class="container-fluid" id="main-result-frame">
+
+<div class="row-fluid">
+	<div class="header">
+		<div class="span3">
+			<img class="composer-picture" src="{{MEDIA_URL}}photos/composers/{{content.picture}}" alt="pic"/>
+		</div>
+		<div class="span7">
+			<div class="composer-name">{{content.name}}</div>
+			<div class="composer-dates">{{content.birth_date}} - {{content.death_date}}</div>
+		</div>
+		<div class="span2">
+			<div class="dostuff">
+				<div class="edit"><i class="icon-pencil"></i>edit</div>
+				<div class="delete"><i class="icon-remove"></i>delete</div>
+			</div>
+		</div>
+	</div>
+</div>
+<br></br>
+<div class="row-fluid" id="lists">
+	<div class="span6">
+		<h4>{{content.name}}'s pieces ({{pieces|length}})</h4>
+		<table cellpadding="3">
+			<tbody>
+			{% for piece in pieces %}
+				<tr>
+					{% with p="/pieces/" %}
+					<td><a href="{{p}}{{piece.id}}">{{piece}}</a></td>
+					{% endwith %}
+		 			<td class="pull-right"> <input type="checkbox" value="{{corpus.id}}" id="check" name="download-items"/><i class="icon-download-alt"></i><input type="checkbox" value="{{corpus.id}}" id="check" name="save-items"/><i class="icon-download"></i>
+		 			</td>
+				</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+	</div>
+	<div class="span6">
+		<h4>{{content.name}}'s movements ({{movements|length}})</h4>
+		<table cellpadding="3">
+			<tbody>
+			{% for movement in movements %}
+				<tr>
+					{% with m="/movement/" %}
+					<td><a href="{{m}}{{movement.id}}">{{movement}}</a></td>
+					{% endwith %}
+		 			<td class="pull-right"> <input type="checkbox" value="{{corpus.id}}" id="check" name="download-items"/><i class="icon-download-alt"></i><input type="checkbox" value="{{corpus.id}}" id="check" name="save-items"/><i class="icon-download"></i>
+		 			</td>
+				</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<form method="post" name="download-composers" action="download.html">
+<div class="row-fluid" id="submit-row">
+<button type="submit" value="Download" class="btn btn-primary">Download and save</button>
+</form>
+</div> 
+
+</div>
+
 
 {% endblock %}

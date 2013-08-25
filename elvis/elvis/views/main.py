@@ -14,12 +14,24 @@ from elvis.models.project import Project
 from elvis.models.todo import Todo
 from elvis.models.discussion import Discussion
 from elvis.models.comment import Comment
+from elvis.models.query import Query
+from elvis.views.corpus import Corpus
+from elvis.views.piece import Piece
+from elvis.views.movement import Movement
 
 def get_models(models):
-    return filter(lambda mod: not mod.startswith('__') or mod[0].islower(), models)
+    return filter(lambda mod: not mod.startswith('__') and mod[0].isupper(), models)
+
+def model_dict(models):
+    model_info = {}
+    for model in models:
+        model_class = getattr(elvis.models, model)
+        model_info[model_class] = model_class._meta.fields
+    return model_info
 
 HTTP_METHODS = ['GET', 'PUT', 'POST', 'HEAD', 'TRACE', 'DELETE', 'OPTIONS']
 MODELS = get_models(dir(elvis.models))
+MODEL_INFO = model_dict(MODELS)
 
 # Render the home page 
 def home(request):
@@ -29,61 +41,116 @@ def home(request):
 def upload(request):
 	return render(request, "upload.html", {})
 
+# TOOD: Need to extract model information from QuerySet
+def get_model(qs):
+    return None
+
 def relevant_field(field): 
     field = str(field)
-    return 'CharField' in field or 'TextField' in field or 'DateField' in field
+    return 'CharField' in field or 'TextField' in field
 
-def filter_dates(results, start, end):
+# Partition data into rows. Used for template organization
+def partition(data, row):
+    partitioned_data = []
+    for x in range(0, len(data), row):
+        partitioned_data.append(data[x:x+row])
+    return partitioned_data
+
+# TODO: Can reduce complexity by hardcoding FK-relations? 
+# TODO: This is bad since PKs can be the same within different tables, so REDO THIS 
+# For each object in each queryset, get PK and query db for all objects where FK=PK
+def get_related(querysets, filters):
+    # If no filters are specified, use all models
+    # Otherwise only look within specified filters 
+    if not filters:
+        filters = MODELS
+    results = []
+    for queryset in querysets:
+        # Get primary key of each object in query set 
+        keys = map(lambda q: q.pk, list(queryset))
+        # For each model get foreign key fields
+        for model in filters:
+            model = getattr(elvis.models, model)
+            fields = filter(lambda field: 'ForeignKey' in str(field), model._meta.fields)
+            for pk in keys:
+                # Create query key, value pairs of FK name and PK
+                query_vals = map(lambda field: (field.name, pk), fields)
+                if query_vals:
+                    # Create conjunction of fields for query 
+                    qset = reduce(operator.or_, (Q(**{field: query}) for field, query in query_vals))
+                    results.append(model.objects.filter(qset))
+    return results
+
+'''
+# TODO: Can reduce complexity by hardcoding DateField relations? 
+# TODO: Can get class names from meta class. what about predefined classes like User? 
+def filter_dates(querysets, start, end, alldb=False):
     # This means should only look at dates related to objects found
-    if results:
-        for result in results:
-            # Iterate through each result set and get all related pk's w/ dates
-            # Can reduce complexity by just hardcoding which ones have dates? 
+    if not alldb:
+        # Iterate through each query set and get all related pk's w/ dates
+        for queryset in querysets:
+            for result in queryset:
+
+
     # Otherwise just return all objects in this range
     else:
+'''
 
-
-
-def filter_voices(results, voices):
+'''
+def filter_voices(results, voices, alldb=False):
     # This means should only look at voices related to objects found
     if results:
         
     # Otherwise just return all objects with this number of voices
     else:
+'''
 
-# Must search CharField, TextField, DateField of all models in specified filters
+
+'''
+SEARCH
+'''
+
+# Must search CharField, TextField of all models in specified filters
 def search(query, exclude, filters):
     # Exclude should be comma-separated list
-    exclude_queries = []
+    excluded_queries = []
     if exclude:
-        exclude_queries = exclude.split(',')
+        excluded_queries = exclude.split(',')
     # If no filter specified, just look through all the models
     if not filters:
         filters = MODELS
     results = []
     for category in filters:
         # Get class associated with filter
-        model = getattr(elvis.models, category.title())
-        # Get relevant attributes of this class
-        fields = filter(lambda field: relevant_field(field), model._meta.fields)
-        # Create query key, value pairs for included and excluded search params
-        included = map(lambda field: (field.name+'__icontains', query), fields)
+        model = getattr(elvis.models, category)
+        included = []
         excluded = []
+        result = []
+        if query:
+            # Get relevant attributes of this class
+            fields = filter(lambda field: relevant_field(field), model._meta.fields)
+            # Create query key, value pairs for included and excluded search params
+            included = map(lambda field: (field.name+'__icontains', query), fields)
         for eq in excluded_queries:
             for field in fields:
                 excluded.append( (field.name+'__icontains', eq) )
-        field_tuples = included + excluded
-        if not field_tuples:
-            break
+
         # Create conjunction of fields for query 
-        qset = reduce(operator.or_, (Q(**{field: query}) for field, query in field_tuples))
-        result = model.objects.filter(qset).exclude()
+        if included:
+            qset_inc = reduce(operator.or_, (Q(**{field: query}) for field, query in included))  
+            result = model.objects.filter(qset_inc)  
+        if excluded:
+            qset_exc = reduce(operator.or_, (Q(**{field: query}) for field, query in excluded))
+            result = result.exclude(qset_exc)
         if result:
             results.append(result)
     return results
 
 # TODO: Need to return items related to search param
-# TODO: Should they be able to query primary keys/ids? 
+# TODO: get filters by class or something 
+# TODO: Add discussion/projects/comments filters
+# TODO: Remove redundancies 
+# TODO: Fix exclude - isn't really working 
 # Query database based on search terms
 def search_view(request):
     if request.method == "GET":
@@ -99,38 +166,60 @@ def search_view(request):
         log = request.GET.get('log')
         voices = request.GET.get('num-voices')
 
-    # Create list of filters
-    raw_filters = [piece, movement, composer, user, discussion, log]
-    filters = filter(lambda x:x is not None and x.title() in MODELS, raw_filters)
+        # First get all valid query parameters
+        querylist = [query, exclude, start_year, end_year, piece, movement, composer, user, discussion, log, voices]
+        querylist = filter(lambda x: not (x is u'' or x is None), querylist)
 
-    # If there is a basic query, search for it
-    if query:
-        results = search(query, exclude, filters)
-        # Now filter further on dates
-        results = filter_dates(results, start_year, end_year)
-        # Now filter further on #of voices
-        results = filter_voices(results, voices)
+        # Now save the query to the database
+        q = Query(query=' '.join(querylist))
+        q.save()
 
-    # Otherwise check for other conditions 
-    else:
-        results = []
-        # Return all objects from filter categories
-        for category in filters:
-            model = getattr(elvis.models, category.title())
-            results.append(model.objects.all())
-        # Now filter further on dates
-        results = filter_dates(results, start_year, end_year)
-        # Now filter further on #of voices
-        results = filter_voices(results, voices)
+        # Create list of filters
+        raw_filters = [piece, movement, composer, user, discussion, log]
+        filters = filter(lambda x:x is not None and x.title() in MODELS, raw_filters)
+
+        # If there is a basic query or exclude statement, search for or omit it or both
+        if query or exclude:
+            results = search(query, exclude, filters)
+            # Now get all related objects 
+            results += get_related(results, filters)
+            # Now filter further on dates
+           # results = filter_dates(results, start_year, end_year)
+            # Now filter further on #of voices
+           # results = filter_voices(results, voices)
+
+        # Otherwise get all objects in specified categories
+        elif filters:
+            filter_classes = map(lambda filt: getattr(elvis.models, filt.title()), filters)
+            results = map(lambda filt_class: filt_class.objects.all(), filter_classes)
+            # Now apply date/voice filters ot these query sets
+           # results = filter_dates(results, start_year, end_year)
+           # results = filter_voices(results, voices)
+
+        # Get all objects that have DateFields in this date range 
+       # elif start_year or end_year:
+       #     results = filter_dates(None, start_year, end_year, alldb=True)
+
+        # Get all pieces/movements from db that have this number of voices 
+       # elif voices: 
+       #     results = filter_voices(None, voices, alldb=True)
     
-    return render(request, 'search_results.html', {"results": results})
+    results = [result for result in results if len(result) > 0]
+    final_results = []
+    for result in results:
+        final_results.extend(result)
+    num_results = len(final_results)
+    return render(request, 'search_results.html', {"results": final_results, "query":querylist, "num_results": num_results})
 
-# Partition data into rows. Used for template organization
-def partition(data, row):
-    partitioned_data = []
-    for x in range(0, len(data), row):
-        partitioned_data.append(data[x:x+row])
-    return partitioned_data
+
+def queries(request):
+    queries = Query.objects.all()
+    return render(request, 'query.html', {"content": queries})
+
+
+'''
+USER PROFILES
+'''
 
 # Render list of user profiles
 def user_profiles(request):
@@ -141,6 +230,10 @@ def user_profiles(request):
 def user_view(request, pk):
     user = UserProfile.objects.filter(pk=pk)[0]
     return render(request, 'userprofile/userprofile_detail.html', {'content':user})
+
+'''
+PROJECTS
+'''
 
 def projects_list(request):
     projects = Project.objects.all()
@@ -185,7 +278,94 @@ def discussion_view(request, pk, did):
     comments = Comment.objects.filter(discussion_id=did)
     context = {"project": project, "discussion": discussion, "comments": comments}
     return render(request, 'discussion/discussion_detail.html', context)
-        
+
+'''
+MODEL LISTS
+'''
+
+# Utility method to sort objects by filters
+def sort_objects(object_name, val):
+    if val is None or val == u"0" or val == u"most":
+        return object_name.objects.all()
+    else:
+        return object_name.objects.all().order_by(val)
+
+def corpora_list(request):
+    val = None
+    if request.method == "POST":
+        val = request.POST.get('sorting')
+    corpora = sort_objects(Corpus, val)
+    if val == u'most':
+        corp = map(lambda corpus:(Piece.objects.filter(corpus_id=corpus.id).count(), corpus), corpora)
+        corp.sort()
+        corpora = [c[1] for c in corp]
+    return render(request, 'corpus/corpus_list.html', {"content":corpora})
+
+def composer_list(request):
+    val = None
+    if request.method == "POST":
+        val = request.POST.get('sorting')
+    if val == u'most':
+        comp = []
+    composers = sort_objects(Composer, val)
+    pieces = {}
+    for composer in composers:
+        p = map(lambda x:x.title, list(Piece.objects.filter(composer_id=composer.id)))[:15]
+        if val == u'most':
+            comp.append( (len(p), composer) )
+        if p:
+            pieces[composer.id] = ', '.join(p)+'...'
+        else:
+            pieces[composer.id] = ''
+    if val == u'most':
+        comp.sort(reverse=True)
+        composers = [c[1] for c in comp]
+    return render(request, 'composer/composer_list.html', {"content": composers, "pieces":pieces})
+
+def piece_list(request):
+    val = None
+    if request.method == "POST":
+        val = request.POST.get('sorting')
+    pieces = sort_objects(Piece, val)
+    return render(request, 'piece/piece_list.html', {"content": pieces})
+
+def movement_list(request):
+    val = None
+    if request.method == "POST":
+        val = request.POST.get('sorting')
+    movements = sort_objects(Movement, val)
+    return render(request, 'movement/movement_list.html', {"content":movements})
+
+def corpus_view(request, pk):
+    corpus = Corpus.objects.get(pk=pk)
+    pieces = Piece.objects.filter(corpus_id=pk)
+    movements = Movement.objects.filter(corpus_id=pk)
+    context = {'content':corpus,
+                'pieces':pieces,
+                'movements':movements}
+    return render(request, 'corpus/corpus_detail.html', context)
+
+def composer_view(request, pk):
+    composer = Composer.objects.get(pk=pk)
+    pieces = Piece.objects.filter(composer_id=pk)
+    movements = Movement.objects.filter(composer_id=pk)
+    context = {'content':composer,
+                'pieces':pieces,
+                'movements':movements}
+    return render(request, 'composer/composer_detail.html', context)
+
+def piece_view(request, pk):
+    piece = Piece.objects.get(pk=pk)
+    movements = Movement.objects.filter(piece_id=pk)
+    return render(request, 'piece/piece_detail.html', {'content':piece, 'movements':movements})
+
+def movement_view(request, pk):
+    movement = Movement.objects.get(pk=pk)
+    return render(request, 'movement/movement_detail.html', {'content':movement})
+
+'''
+DOWNLOADS
+'''
 
 # Used across html files to save items to download later
 # TODO: How to get current user? 
