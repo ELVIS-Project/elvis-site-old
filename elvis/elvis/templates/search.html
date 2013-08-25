@@ -2,10 +2,7 @@
 
 {% block wrap %}
 
-<p>Search Page</p>
-
-<style type="text/css">
-
+<style>
 .date-input {
 	font-size:9px;
 	font-family:Verdana, Arial, Helvetica, sans-serif;
@@ -25,147 +22,91 @@ input {
 	width:250px;
 }
 
-#container {
-	background-color:#4682B4;
-	padding:1px;
+#search-header {
+	border-top:solid;
+	border-bottom:solid;
+	border-width:2px;
+	border-color:#909090;
+	margin-top:20px;
 }
 
-.search-header {
-	background-color:#B0C4DE;
-	font-style:strong;
-	font-family:Verdana, Arial, Helvetica, sans-serif;
-	font-weight:bold;
-	padding:1px;
-	margin-top:10px;
-	margin-left:5px;
-}
-
-.filter-row {
-	-webkit-box-sizing:border-box;
-	-moz-box-sizing:border-box;
-	box-sizing:border-box;
-	display:table-row;
-	float:none;
-	width:100%;
-	display:inline;
-	float:left;
-	margin:8px;
-
-}
-
-table {
-	margin:5px;
-	table-layout:fixed;
-	width:100%;
-	border:1px;
-}
-
-.group {
-	font-family:Verdana, Arial, Helvetica, sans-serif;
-	font-weight:bold;
-	border-style:solid solid solid solid;
-	border-width:thin;
-	padding:10px;
-}
-
-.group:hover {
-	background-color:#B0C4DE;
-}
-
-.category-box {
-	display:none;
-}
-
-#row1, #row3 {
-	background-color:#B0C4DE;
-}
-#row2 {
-	margin-top:18px;
-	margin-left:5px;
-}
-#row3, #row4 {
+.span3, .span1, .span2, .span4 {
 	margin-top:10px;
 }
-#header1, #header4 {
-	margin-left:5px;
+
+.category-check {
+}
+.category-check:clicked + .category {
+  background-color:#EE82EE;
+  font-weight:bold;
 }
 
-</style> 
+.category:clicked {
+	background-color:#EE82EE;
+}
 
+.dropdown-menu li:hover .sub-menu {
+    visibility: visible;
+}
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
 
-<div class="container-fluid" id="container">
-	<div class="row-fluid" id="row1">
-		<div class="span3">
-			<div class="search-header" id="header1">search by keyword </div>
-		</div>
-		<div class="span3">
-			<div class="search-header"><p>exclude by keyword </p></div>
-		</div>
-		<div class="span3">
-			<div class="search-header"><p>filter by year</p></div>
-		</div>
-	</div>
-	{% with search="/search_results/" %}
+</style>
+
+{% with search="/search_results/" %}
 	<form action="{{search}}" method="get">
-	{% endwith %}
-	<div class="row-fluid" id="row2">
-		<div class="span3">
-			<input class="input" type="text" value="" name="search" id="search-all" size="400" placeholder=""/>
+{% endwith %}
+<div class="container-fluid">
+	<div class="row-fluid" id="search-header">
+		<div class="span3" id="search-box">
+			<input class="input" type="text" value="" name="search" id="search-all" size="400" placeholder="search by keyword"/>
 		</div>
 		<div class="span3">
-			<input class="input" type="text" value="" name="exclude" id="search-pieces" size="400" placeholder="comma separated" />
+			<div class="pull-right">Filter by year:
+			<input class="date-input" type="text" value="" name="start-year" id="start-year" size="10" placeholder="start"/> <input class="date-input" type="text" value="" name="end-year" id="end-year" size="10" placeholder="end" /></div>
 		</div>
-		<div class="span3">
-			<input class="date-input" type="text" value="" name="start-year" id="start-year" size="10" placeholder="start"/>
-			<input class="date-input" type="text" value="" name="end-year" id="end-year" size="10" placeholder="end" />
+		<div class="span2">
+			<div class="pull-right">Search in:  
+				<div class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#">Category <i class="icon-chevron-down"></i></a>
+					<ul class="dropdown-menu">
+						<li class="category"><span class="a">Corpora</span></li>  
+                        <li class="category"><span class="a">Composers</span></li> 
+                        <li class="category"><span class="a">Movements</span></li>  
+                        <li class="category"><span class="a">Pieces</span></li> 
+                        <li class="category"><span class="a">Tags</span></li>  
+                        <li class="divider"></li>  
+                        <li class="category"><span class="a">Discussions</span></li>  
+                        <li class="category"><span class="a">Users</span></li>
+					</ul>
+				</div>
+
+			</div>
 		</div>
-	</div>
-	<div class="row-fluid" id="row3">
-		<div class="span6">
-			<div class="search-header" id="header4"><p>filter by category </p></div>
-		</div>
-		<div class="span6">
-			<div class="search-header"><p>number of voices</p></div>
-		</div>
-	</div>
-	<div class="row-fluid" id="row4">
-		<div class="span6">
-			<table border="1">
-				<tr>
-					<td class="group"><label>
-						<input type="checkbox" class="category-box" value="Piece" name="piece" id="piece-id"/>Piece</label> 
-					</td>
-					<td class="group"><label>
-						<input type="checkbox" class="category-box" value="Movement" name="movement" id="movement-id"/>Movement</label>
-					</td>
-					<td class="group"><label>
-						<input type="checkbox" class="category-box" value="Composer" name="composer" id="composer-id"/>Composer</label>
-					</td>
-				</tr>
-				<tr>
-					<td class="group">
-						<label>
-						<input type="checkbox" class="category-box" value="User" name="user" id="user-id"/>User</label>
-					</td>
-					<td class="group">
-						<label>
-						<input type="checkbox" class="category-box" value="Discussion" name="discussion" id="discussion-id"/>Discussion</label>
-					</td>
-					<td class="group">
-						<label>
-						<input type="checkbox" class="category-box" value="Log" name="log" id="log-id"/>Log</label>
-					</td>
-				</tr>
-			</table>
-		</div>
-		<div class="span6">
-			<input class="date-input" type="text" value="" name="num-voices" id="num-voices" size="10"/>
+		<div class="span3" id="voices-box">
+			<div class="pull-right">Number of voices: <input class="date-input" type="text" value="" name="num-voices" id="num-voices" size="10"/></div>
 		</div>
 	</div>
 	<div class="row-fluid">
-		<input type="submit" value="submit"></form>
+		<input type="submit" value="go!"/>
+		<input type="reset" name="reset">
 	</div>
 </div>
+</form>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+<script src="{{ STATIC_URL }}js/bootstrap.js"></script>
+    <script type="text/javascript">  
+        $(document).ready(function () {  
+            $('.dropdown-toggle').dropdown();  
+        });  
+   </script>
+
+   <script type="text/javascript">
+   	$('li[class="category"]').click(function(){
+   		$(this).css("background-color:#EE82EE")
+	});
+   </script>
 
  {% block content %}
  {% endblock %}

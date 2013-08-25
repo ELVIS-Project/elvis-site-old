@@ -67,17 +67,19 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button> -->
-                    <a class="brand" href="#">ELVIS</a>
+                    {% with home="/" %}
+                    <a class="brand" href="{{home}}">ELVIS</a>
+                    {% endwith %}
                     <div class="nav-collapse collapse">
                         <ul class="nav">
                             {% with about="/about/" %}{% with projects="/projects/" %}{% with everyone="/userprofiles/" %}
-                            <li><a href="#">Home</a></li>
+                            {% with queries="/queries/" %}
                             <li><a href="{{about}}">About</a></li>
                             <li><a href="{{projects}}">Projects</a></li>
-                            <li><a href="#">Queries</a></li>
+                            <li><a href="{{queries}}">Queries</a></li>
                             <li id="separator"><a href="{{everyone}}">Everyone</a></li>
                             <li><a href="#">Me</a></li>
-                            {% endwith %}{% endwith %}{% endwith %}
+                            {% endwith %}{% endwith %}{% endwith %}{% endwith %}
                         </ul>
                         <p class="navbar-text pull-right">
                             {% with downloads="/downloads/" %}
@@ -100,10 +102,6 @@
                             <td class="dropdown">
                                 {% with search="/search/" %}{% with upload="/upload/" %}
                                 <a class="model-link" href="{{search}}" class="dropdown-toggle" data-toggle="dropdown">Search</a>
-                                <ul class="dropdown-menu">
-                                    <li>example</li>
-                                    <li>example</li>
-                                </ul>
                             </td>
                         </tr>
                         <tr>
@@ -130,6 +128,7 @@
                         </tr>
                         {% endwith %}{% endwith %}{% endwith %}{% endwith %}
                     </table>
+
                 </div>
                 <div class="span10" id="main-frame">
 
@@ -143,51 +142,6 @@
 
 
 </html>
-
-    <!--
-    <body>
-       <div class="container">         
-        <div class="masthead">
-            <h3 class="muted">ELVIS</h3>    
-            <div class="navbar navbar-fixed-top">
-                <div class="navbar-inner">
-                    <div class="container-fluid">
-                        <ul class="nav">
-                            <li class="active"><a href="#">Test</a></li>
-                            <li><a href="#">About</a></li>
-                            <li><a href="#">Login</a></li>
-                            <li><a href="#">Search</a></li>
-                            <li><a href="#">Upload</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="container-fluid">
-                <div class="row-fluid">
-                    <div class="span3">
-                        <div class="sidebar-nav">
-                            <ul class="nav nav-list">
-                                <li class="nav-header">View all: </li>
-                                <li><a href="corpora">Corpora</a></li>
-                                <li><a href="composers">Composers</a></li>
-                                <li><a href="pieces">Pieces</a></li>
-                                <li><a href="movements">Movements</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="span3">
-                       block wrap
-                    </div>
-                </div>
-            </div>
-        </div>
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-        <script>window.jQuery || document.write('<script src="{{ STATIC_URL }}js/jquery-1.9.1.min.js"><\/script>')</script>
-        <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
-        <script src="{{ STATIC_URL }}js/plugins.js"></script>
-    </body>
--->
 
 
 

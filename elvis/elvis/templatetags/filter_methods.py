@@ -13,7 +13,7 @@ Or can use decorator (@register.filter).
 def assign_id(name, counter): return str(name)+str(counter)
 
 @register.filter
-def get_comments(comments, key): return comments.get(key)
+def get_value(dictionary, key): return dictionary.get(key)
 
 @register.filter
 def format_time(timestamp):
