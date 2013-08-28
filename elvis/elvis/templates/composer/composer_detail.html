@@ -82,6 +82,31 @@
 
 </style>
 
+<script type="text/javascript">
+// function to open a popup window with form 
+function newPopup(url) {
+	popupWindow = window.open(
+		url,'popUpWindow','height=450,width=550,left=10,top=10,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')
+}
+</script>
+
+<script type="text/javascript">
+function saveAll(source) {
+  checkboxes = document.getElementsByName('save-pieces');
+  for(var i=0, n=checkboxes.length;i<n;i++) {
+    checkboxes[i].checked = source.checked;
+  }
+}
+</script>
+<script type="text/javascript">
+function downloadAll(source) {
+  checkboxes = document.getElementsByName('download-pieces');
+  for(var i=0, n=checkboxes.length;i<n;i++) {
+    checkboxes[i].checked = source.checked;
+  }
+}
+</script>
+
 <div class="container-fluid" id="main-result-frame">
 
 <div class="row-fluid">
@@ -92,16 +117,25 @@
 		<div class="span7">
 			<div class="composer-name">{{content.name}}</div>
 			<div class="composer-dates">{{content.birth_date}} - {{content.death_date}}</div>
+			<br>
+			<div class="row-fluid">
+				<div class="span3">
+			<input type="checkbox" id="check" onClick="saveAll(this)"/> <b style="font-size:.85em;color:#CD5C5C;">save all</b> </div>
+			<div class="span4">
+			<input type="checkbox" id="check" onClick="downloadAll(this)"/> <b style="font-size:.85em;color:#CD5C5C;">download all</b><br/></div>
+			</div>
 		</div>
 		<div class="span2">
 			<div class="dostuff">
-				<div class="edit"><i class="icon-pencil"></i>edit</div>
-				<div class="delete"><i class="icon-remove"></i>delete</div>
+				<div class="edit"><i class="icon-pencil"></i><a href="">edit</a></div>
+				<div class="delete"><i class="icon-remove"></i><a href="JavaScript:newPopup('{{url}}delete/');">delete</a></div>
+				
 			</div>
 		</div>
 	</div>
 </div>
 <br></br>
+<form method="post" name="download-composers" action=""> {% csrf_token %}
 <div class="row-fluid" id="lists">
 	<div class="span6">
 		<h4>{{content.name}}'s pieces ({{pieces|length}})</h4>
@@ -112,7 +146,7 @@
 					{% with p="/pieces/" %}
 					<td><a href="{{p}}{{piece.id}}">{{piece}}</a></td>
 					{% endwith %}
-		 			<td class="pull-right"> <input type="checkbox" value="{{corpus.id}}" id="check" name="download-items"/><i class="icon-download-alt"></i><input type="checkbox" value="{{corpus.id}}" id="check" name="save-items"/><i class="icon-download"></i>
+		 			<td class="pull-right"> <input type="checkbox" value="{{piece.id}}" id="check" name="download-pieces"/><i class="icon-download-alt"></i><input type="checkbox" value="{{piece.id}}" id="check" name="save-pieces"/><i class="icon-download"></i>
 		 			</td>
 				</tr>
 			{% endfor %}
@@ -120,26 +154,27 @@
 		</table>
 	</div>
 	<div class="span6">
-		<h4>{{content.name}}'s movements ({{movements|length}})</h4>
+		<h4>{{content.name}}'s movements ({{movements|get_length}})</h4>
 		<table cellpadding="3">
 			<tbody>
-			{% for movement in movements %}
+			{% for piece in pieces %}
+			{% for movement in movements|get_value:piece.id %}
 				<tr>
-					{% with m="/movement/" %}
-					<td><a href="{{m}}{{movement.id}}">{{movement}}</a></td>
+					{% with m="/movements/" %}
+					<td><a href="{{m}}{{movement.id}}">{{piece.title}}: {{movement}}</a></td>
 					{% endwith %}
-		 			<td class="pull-right"> <input type="checkbox" value="{{corpus.id}}" id="check" name="download-items"/><i class="icon-download-alt"></i><input type="checkbox" value="{{corpus.id}}" id="check" name="save-items"/><i class="icon-download"></i>
+		 			<td class="pull-right"> <input type="checkbox" value="{{movement.id}}" id="check" name="download-movements"/><i class="icon-download-alt"></i><input type="checkbox" value="{{movement.id}}" id="check" name="save-movements"/><i class="icon-download"></i>
 		 			</td>
 				</tr>
+			{% endfor %}
 			{% endfor %}
 			</tbody>
 		</table>
 	</div>
 </div>
 
-<form method="post" name="download-composers" action="download.html">
 <div class="row-fluid" id="submit-row">
-<button type="submit" value="Download" class="btn btn-primary">Download and save</button>
+<button type="submit" value="Download" class="btn btn-primary">Download and save</button> {% csrf_token %}
 </form>
 </div> 
 

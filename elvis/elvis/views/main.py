@@ -3,8 +3,10 @@ import elvis.models
 
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from django.db.models import Q
 
+from django.contrib.auth.models import User
 from elvis.models.attachment import Attachment
 from elvis.models.composer import Composer
 from elvis.models.download import Download
@@ -19,6 +21,7 @@ from elvis.views.corpus import Corpus
 from elvis.views.piece import Piece
 from elvis.views.movement import Movement
 
+'''
 def get_models(models):
     return filter(lambda mod: not mod.startswith('__') and mod[0].isupper(), models)
 
@@ -32,6 +35,9 @@ def model_dict(models):
 HTTP_METHODS = ['GET', 'PUT', 'POST', 'HEAD', 'TRACE', 'DELETE', 'OPTIONS']
 MODELS = get_models(dir(elvis.models))
 MODEL_INFO = model_dict(MODELS)
+'''
+
+USER = User.objects.get(pk=40)
 
 # Render the home page 
 def home(request):
@@ -294,6 +300,7 @@ def corpora_list(request):
     val = None
     if request.method == "POST":
         val = request.POST.get('sorting')
+        save_corpus(request.POST.getlist('save-items'))
     corpora = sort_objects(Corpus, val)
     if val == u'most':
         corp = map(lambda corpus:(Piece.objects.filter(corpus_id=corpus.id).count(), corpus), corpora)
@@ -301,10 +308,23 @@ def corpora_list(request):
         corpora = [c[1] for c in corp]
     return render(request, 'corpus/corpus_list.html', {"content":corpora})
 
+def corpora_list_min(request):
+    val = None
+    if request.method == "POST":
+        val = request.POST.get('sorting')
+        save_corpus(request.POST.getlist('save-items'))
+    corpora = sort_objects(Corpus, val)
+    if val == u'most':
+        corp = map(lambda corpus:(Piece.objects.filter(corpus_id=corpus.id).count(), corpus), corpora)
+        corp.sort()
+        corpora = [c[1] for c in corp]
+    return render(request, 'corpus/corpus_list_min.html', {"content":corpora})
+
 def composer_list(request):
     val = None
     if request.method == "POST":
         val = request.POST.get('sorting')
+        save_composer(request.POST.getlist('save-items'))
     if val == u'most':
         comp = []
     composers = sort_objects(Composer, val)
@@ -320,12 +340,28 @@ def composer_list(request):
     if val == u'most':
         comp.sort(reverse=True)
         composers = [c[1] for c in comp]
-    return render(request, 'composer/composer_list.html', {"content": composers, "pieces":pieces})
+    context = {"content": composers, "pieces":pieces }
+    return render(request, 'composer/composer_list.html', context)
+
+def composer_list_min(request):
+    val = None
+    if request.method == "POST":
+        val = request.POST.get('sorting')
+        save_composer(request.POST.getlist('save-items'))
+    if val == u'most':
+        comp = []
+    composers = sort_objects(Composer, val)
+    if val == u'most':
+        comp.sort(reverse=True)
+        composers = [c[1] for c in comp]
+    context = {"content": composers }
+    return render(request, 'composer/composer_list_min.html', context)
 
 def piece_list(request):
     val = None
     if request.method == "POST":
         val = request.POST.get('sorting')
+        save_pieces(request.POST.getlist('save-pieces'))
     pieces = sort_objects(Piece, val)
     return render(request, 'piece/piece_list.html', {"content": pieces})
 
@@ -333,35 +369,124 @@ def movement_list(request):
     val = None
     if request.method == "POST":
         val = request.POST.get('sorting')
+        save_movements(request.POST.getlist('save-movements'))
     movements = sort_objects(Movement, val)
     return render(request, 'movement/movement_list.html', {"content":movements})
 
+# Download has attachment associated with either piece or movement
+def download_list(request):
+    if request.method == 'POST':
+        dl_ids = request.POST.getlist('download-item')
+        for dl_id in dl_ids:
+            Download.objects.get(pk=int(str(dl_id))).delete()
+    downloads = Download.objects.all()
+    return render(request, 'download/download_list.html', {"content": downloads})
+
+'''
+SAVE Utility functions
+'''
+
+# TODO: This should probably take a piece object not str/int
+# Causes superfluous querying of db from save_corpus/composer/etc
+def save_piece(piece):
+    p = Piece.objects.get(pk=int(piece))
+    # Save all of a piece's movements
+    movs = Movement.objects.filter(piece_id=int(piece))
+    if movs:
+        for m in movs.all():
+            for attachment in m.attachments.all():
+                dl = Download(user=USER, attachment=attachment)
+                dl.save()
+    # If piece has attachment, save this
+    else:
+        attachments = p.attachments.all()
+        if attachments:
+            for attachment in attachments:
+                dl = Download(user=USER, attachment=attachment)
+                dl.save()
+
+def save_movement(movement):
+    m = Movement.objects.get(pk=int(movement))
+    for attachment in m.attachments.all():
+        dl = Download(user=USER, attachment=attachment)
+        dl.save()
+
+def save_pieces(pieces):
+    if pieces:
+        for piece in pieces:
+            save_piece(piece)
+
+def save_movements(movements):
+    if movements:
+        for movement in movements:
+            save_movement(movement)
+
+def save_corpus(corpus):
+    if corpus:
+        pieces = Piece.objects.filter(corpus_id=int(corpus))
+        for piece in pieces:
+            save_piece(piece.id)
+
+def save_composer(composer):
+    if composer:
+        pieces = Piece.objects.filter(composer_id=int(composer))
+        for piece in pieces:
+            save_piece(piece.id)
+
+'''
+MODEL DETAILS
+'''
+
 def corpus_view(request, pk):
+    if request.method == 'POST':
+        save_pieces(request.POST.getlist('piece-save'))
+        save_movements(request.POST.getlist('movement-save'))
+        dl_piece = request.POST.getlist('piece-download')
+        dl_movement = request.POST.getlist('movement-download')
+
+        return HttpResponseRedirect('/downloads/')
+
     corpus = Corpus.objects.get(pk=pk)
     pieces = Piece.objects.filter(corpus_id=pk)
-    movements = Movement.objects.filter(corpus_id=pk)
+    movements = {}
+    for piece in pieces:
+        movements[piece.id] = Movement.objects.filter(piece_id=piece.id)
     context = {'content':corpus,
                 'pieces':pieces,
-                'movements':movements}
+                'movements':movements,
+                'url': request.build_absolute_uri()}
     return render(request, 'corpus/corpus_detail.html', context)
 
 def composer_view(request, pk):
+    if request.method == 'POST':
+        save_pieces(request.POST.getlist('save-pieces'))
+        save_movements(request.POST.getlist('save-movements'))
+        dl_piece = request.POST.getlist('download-pieces')
+        dl_movement = request.POST.getlist('download-movements')
+
+        return HttpResponseRedirect('/downloads/')
+
     composer = Composer.objects.get(pk=pk)
     pieces = Piece.objects.filter(composer_id=pk)
-    movements = Movement.objects.filter(composer_id=pk)
+    movements = {}
+    for piece in pieces:
+        movements[piece.id] = Movement.objects.filter(piece_id=piece.id)
     context = {'content':composer,
                 'pieces':pieces,
-                'movements':movements}
+                'movements':movements,
+                'url': request.build_absolute_uri()}
     return render(request, 'composer/composer_detail.html', context)
 
 def piece_view(request, pk):
     piece = Piece.objects.get(pk=pk)
     movements = Movement.objects.filter(piece_id=pk)
-    return render(request, 'piece/piece_detail.html', {'content':piece, 'movements':movements})
+    url = request.build_absolute_uri()
+    return render(request, 'piece/piece_detail.html', {'content':piece, 'movements':movements, 'url':url})
 
 def movement_view(request, pk):
     movement = Movement.objects.get(pk=pk)
-    return render(request, 'movement/movement_detail.html', {'content':movement})
+    url = request.build_absolute_uri()
+    return render(request, 'movement/movement_detail.html', {'content':movement, 'url':url})
 
 '''
 DOWNLOADS

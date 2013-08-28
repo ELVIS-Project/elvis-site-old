@@ -67,6 +67,14 @@
 	box-shadow: 0 0 5px #888;
 }
 
+table {
+	margin: 0 auto;
+}
+span {
+	margin-left:2px;
+	margin-right:2px;
+}
+
 </style>
 
 <div class="container-fluid" id="main-result-frame">
@@ -99,12 +107,12 @@
 	{% endwith %}{% endwith %}{% endwith %}
 	</div>
 	<div class="span4">
-	<b>Number of downloads:</b><br>
+	<b>Number of downloads:</b>{{content.number_of_downloads}}<br>
 	<b>Number of queries:</b><br>
-	<b>File:</b><br>
+	<b>File:</b> {% for file in content.attachments.all %} {{file}}<i class="icon-file"></i> {% endfor %}<br>
 	</div>
 	<div class="span4">
-		<b>Associated movements:</b>
+		<b>Movements:</b>
 		{% with m="/movements/" %}
 		<ul>
 		{% for movement in movements %}
@@ -119,11 +127,13 @@
 	<span class="label">tag1</span> <span class="label label-success">tag2</span><span class="label label-warning">tag3</span><span class="label label-important">tag4</span><span class="label label-info">tag5</span><span class="label label-inverse">tag6</span>
 </div>
 
-<form method="post" name="download-composers" action="download.html">
 <div class="row-fluid" id="submit-row">
-<button type="submit" value="Download" class="btn btn-primary"><i class="icon-download-alt"></i> Download </button>
-<button type="submit" value="Download" class="btn btn-primary"><i class="icon-download"></i> Save </button>
-</form>
+<table>
+	<tr> <td> <form method="post" name="download-piece" action="download/">{% csrf_token %}
+<button type="submit" value="Download" class="btn btn-primary"><i class="icon-download-alt"></i> Download </button></form> </td>
+	<td> <form method="post" name="save-piece" action="save/">{% csrf_token %} <button type="submit" value="Save" class="btn btn-primary"><i class="icon-download"></i> Save </button></form>
+	</tr>
+</table>
 </div> 
 
 </div>

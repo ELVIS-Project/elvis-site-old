@@ -24,6 +24,7 @@ class Attachment(models.Model):
         attempting to attach a file. If not, self.pk will not be set and all
         kinds of weirdness will take place.
     """
+
     @property
     def attachment_path(self):
         return os.path.join(settings.MEDIA_ROOT,

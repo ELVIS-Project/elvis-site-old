@@ -79,11 +79,12 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/var/www/example.com/static/"
-STATIC_ROOT =''
+STATIC_ROOT = '/Users/morganeciot/musicresearch/elvis-site/elvis/static/'
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
 STATIC_URL = '/static/'
+
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -151,10 +152,27 @@ INSTALLED_APPS = (
     'rest_framework',
     'rest_framework.authtoken',
     'debug_toolbar',
+    #'haystack',
     # Uncomment the next line to enable the admin:
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
+
+'''
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+        'URL': 'http://127.0.0.1:8983/solr'
+        # ...or for multicore...
+        # 'URL': 'http://127.0.0.1:8983/solr/mysite',
+    },
+}
+
+
+HAYSTACK_SEARCH_ENGINE = 'solr'
+HAYSTACK_SITECONF = 'elvis.search_sites'
+HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr'
+'''
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

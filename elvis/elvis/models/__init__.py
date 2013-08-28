@@ -12,3 +12,5 @@ from elvis.models.todo import Todo
 from elvis.models.comment import Comment
 from elvis.models.discussion import Discussion
 from elvis.models.query import Query
+
+#from elvis.models.search_indexes import CorpusIndex

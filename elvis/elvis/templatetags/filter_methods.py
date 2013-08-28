@@ -16,6 +16,13 @@ def assign_id(name, counter): return str(name)+str(counter)
 def get_value(dictionary, key): return dictionary.get(key)
 
 @register.filter
+def get_length(dictionary): 
+	length = 0
+	for key,val in dictionary.iteritems():
+		length += len(val)
+	return length
+
+@register.filter
 def format_time(timestamp):
 	today = datetime.now()
 	today = timezone.make_aware(today, timezone.get_default_timezone())

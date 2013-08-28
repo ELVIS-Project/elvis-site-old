@@ -173,7 +173,7 @@ function handler(sort_name){
 
 	<div class="row-fluid" id="separator"> </div>
 
-	<form method="post" name="download-composers" action="download.html">
+	<form method="post" name="download-composers" action=""> {% csrf_token %}
 
 	{% for movement in content %}
 	<div class="row-fluid">
@@ -187,13 +187,13 @@ function handler(sort_name){
     			<div class="corp-descrip">{{movement.comment|truncatechars:100}}</div>
     			<div>{{movement.date_of_composition|format_time}} - {{movement.piece}} - {{movement.composer}} - {{movement.corpus}}</div>
     			<div>truncated list of tags?</div>
-				<div class="corp-download"><input type="checkbox" value="{{corpus.id}}" id="check" name="download-items"/>download now <i class="icon-download-alt"></i><input type="checkbox" value="{{corpus.id}}" id="check" name="save-items"/>download later<i class="icon-download"></i></div>
+				<div class="corp-download"><input type="checkbox" value="{{movement.id}}" id="check" name="download-movements"/>download now <i class="icon-download-alt"></i><input type="checkbox" value="{{movement.id}}" id="check" name="save-movements"/>download later<i class="icon-download"></i></div>
     	</div>
     </div>
 	{% endfor %}
 
 <div class="row-fluid" id="submit-row">
-<button type="submit" value="Download" class="btn btn-primary">Download and save</button>
+<button type="submit" value="Download" class="btn btn-primary">Download and save</button>{% csrf_token %}
 </form>
 </div> 
 

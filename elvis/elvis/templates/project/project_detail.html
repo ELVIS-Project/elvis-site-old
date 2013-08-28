@@ -19,7 +19,7 @@ function toggle_comments(counter) {
 } 
 </script>
 
-<style type="text/css">
+<style type="text/css"> 
 
 /* shadow code found at http://www.css3.info/preview/box-shadow/ */
 
@@ -192,7 +192,7 @@ function toggle_comments(counter) {
 				<a href="{{proj}}{{content.id}}{{disc}}{{discussion.id}}" class="pull-right">{{ comment_set|length }} comment <!--<i class="icon-arrow-right"></i>--></a></div>
 			{% else %}
 				<a href="{{proj}}{{content.id}}{{disc}}{{discussion.id}}" class="pull-right">{{ comment_set|length }} comments <!--<i class="icon-arrow-right"></i>--></a></div>
-			{% endif %}
+			{% endif %} 
 
 		{% with name="toggleComments" %}
 		<div class="container" id="{{name|assign_id:forloop.counter}}" style="display: none">
@@ -202,15 +202,15 @@ function toggle_comments(counter) {
 				<tbody>  
 					{% for comm in comment_set %}
 					<tr>  
-		            	<td nowrap="nowrap"><img class="prof-pic" src="{{MEDIA_URL}}photos/{{comm.user.picture}}" alt="Profile Picture"/> </td>  
-		            	<td>{{ comm.text }} </td>  
-		            	<td nowrap="nowrap"><b id="create-time">{{ comm.created|format_time }}</b></td> 
-		          	</tr>  
+		            	<td><img class="prof-pic" src="{{MEDIA_URL}}photos/{{comm.user.picture}}" alt="Profile Picture"/> </td>  
+		            	<td><div style="width:600px;">{{ comm.text }}</div> </td>  
+		            	<td><b id="create-time">{{ comm.created|format_time }}</b></td> 
+		          	</tr> 
 		          	{% endfor %}
 		          	<tr>  
-		            	<td nowrap="nowrap"><img class="prof-pic" src="{{MEDIA_URL}}photos/{{discussion.first_user.picture}}" alt="Profile Picture"/> </td>  
-		            	<td>{{ discussion.first_comment }} </td>  
-		            	<td nowrap="nowrap"><b id="create-time">{{ discussion.created|format_time }}</b></td> 
+		            	<td><img class="prof-pic" src="{{MEDIA_URL}}photos/{{discussion.first_user.picture}}" alt="Profile Picture"/> </td>  
+		            	<td><div style="width:600px;">{{ discussion.first_comment }} </div></td>  
+		            	<td><b id="create-time">{{ discussion.created|format_time }}</b></td> 
 		          	</tr>  
 		        </tbody>
 		    </table>

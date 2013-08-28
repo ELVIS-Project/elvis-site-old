@@ -85,6 +85,23 @@
 
 </style>
 
+<script type="text/javascript">
+function saveAll(source) {
+  checkboxes = document.getElementsByName('piece-save');
+  for(var i=0, n=checkboxes.length;i<n;i++) {
+    checkboxes[i].checked = source.checked;
+  }
+}
+</script>
+<script type="text/javascript">
+function downloadAll(source) {
+  checkboxes = document.getElementsByName('piece-download');
+  for(var i=0, n=checkboxes.length;i<n;i++) {
+    checkboxes[i].checked = source.checked;
+  }
+}
+</script>
+
 <div class="container-fluid" id="main-result-frame">
 
 <div class="row-fluid">
@@ -100,6 +117,15 @@
 			<div>{{content.comment}}</div>
 			<br>
 			<div class="last-update">last updated {{content.updated}} </div>
+
+			<br>
+			<div class="row-fluid">
+				<div class="span3">
+			<input type="checkbox" id="check" onClick="saveAll(this)"/> <b style="font-size:.85em;color:#CD5C5C;">save all</b> </div>
+			<div class="span4">
+			<input type="checkbox" id="check" onClick="downloadAll(this)"/> <b style="font-size:.85em;color:#CD5C5C;">download all</b><br/></div>
+			</div>
+
 		</div>
 		<div class="span2">
 			<div class="dostuff">
@@ -110,6 +136,7 @@
 	</div>
 </div>
 <br></br>
+<form method="post" name="download-save-corpora" action="">{% csrf_token %}
 <div class="row-fluid" id="lists">
 	<div class="span6">
 		<h4>Pieces from {{content.title}} ({{pieces|length}})</h4>
@@ -120,7 +147,7 @@
 					{% with p="/pieces/" %}
 					<td><a href="{{p}}{{piece.id}}">{{piece}}</a></td>
 					{% endwith %}
-		 			<td class="pull-right"> <input type="checkbox" value="{{corpus.id}}" id="check" name="download-items"/><i class="icon-download-alt"></i><input type="checkbox" value="{{corpus.id}}" id="check" name="save-items"/><i class="icon-download"></i>
+		 			<td class="pull-right"> <input type="checkbox" value="{{piece.id}}" id="check" name="piece-download"/><i class="icon-download-alt"></i><input type="checkbox" value="{{piece.id}}" id="check" name="piece-save"/><i class="icon-download"></i>
 		 			</td>
 				</tr>
 			{% endfor %}
@@ -131,23 +158,24 @@
 		<h4>Movements from {{content.title}} ({{movements|length}})</h4>
 		<table cellpadding="3">
 			<tbody>
-			{% for movement in movements %}
+			{% for piece in pieces %}
+			{% for movement in movements|get_value:piece.id %}
 				<tr>
 					{% with m="/movements/" %}
-					<td><a href="{{m}}{{movement.id}}">{{movement}}</a></td>
+					<td><a href="{{m}}{{movement.id}}">{{piece.title}}: {{movement}}</a></td>
 					{% endwith %}
-		 			<td class="pull-right"> <input type="checkbox" value="{{corpus.id}}" id="check" name="download-items"/><i class="icon-download-alt"></i><input type="checkbox" value="{{corpus.id}}" id="check" name="save-items"/><i class="icon-download"></i>
+		 			<td class="pull-right"> <input type="checkbox" name="movement-download" value="{{movement.id}}" id="check"/><i class="icon-download-alt"></i><input type="checkbox" name="movement-save" value="{{movement.id}}" id="check"/><i class="icon-download"></i>
 		 			</td>
 				</tr>
+			{% endfor %}
 			{% endfor %}
 			</tbody>
 		</table>
 	</div>
 </div>
 
-<form method="post" name="download-composers" action="download.html">
 <div class="row-fluid" id="submit-row">
-<button type="submit" value="Download" class="btn btn-primary">Download and save</button>
+<button type="submit" value="Download" class="btn btn-primary">Download and save</button>{% csrf_token %}
 </form>
 </div> 
 

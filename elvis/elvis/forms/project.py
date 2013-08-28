@@ -3,8 +3,7 @@ from django import forms
 class ProjectForm(forms.Form):
 	name = forms.CharField(max_length=255)
 	description = forms.CharField(widget=forms.Textarea, required=False)
-	#users = pick users to invite - send email
-	#attachments = 
+	users = forms.CharField(widget=forms.Textarea, required=False)
 
 class DiscussionForm(forms.Form):
 	name = forms.CharField(max_length=255)

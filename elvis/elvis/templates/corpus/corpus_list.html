@@ -82,6 +82,11 @@
 	float:right;
 }
 
+.icon-align-justify {
+	float:right;
+	margin-right:60px;
+}
+
 .click-nav {
 	margin:10px auto;
 	width:180px;
@@ -141,6 +146,25 @@ function newPopup(url) {
 }
 </script>
 
+<script type="text/javascript">
+function saveAll(source) {
+  checkboxes = document.getElementsByName('save-items');
+  for(var i=0, n=checkboxes.length;i<n;i++) {
+    checkboxes[i].checked = source.checked;
+  }
+}
+</script>
+<script type="text/javascript">
+function downloadAll(source) {
+  checkboxes = document.getElementsByName('download-items');
+  for(var i=0, n=checkboxes.length;i<n;i++) {
+    checkboxes[i].checked = source.checked;
+  }
+}
+</script>
+
+<a href="/corporamin/"><i class="icon-align-justify"></i></a><br>
+
 <div class="container-fluid" id="main-result-frame">
 	<div class="row-fluid">
 		<div class="span5">
@@ -150,6 +174,14 @@ function newPopup(url) {
 			{% else %}
 			<h4> {{ content|length }} corpora found </h4>
 			{% endif %}
+
+			<div class="row-fluid">
+				<div class="span3">
+			<input type="checkbox" id="check" onClick="saveAll(this)"/> <b style="font-size:.85em;color:#CD5C5C;">save all</b> </div>
+			<div class="span4">
+			<input type="checkbox" id="check" onClick="downloadAll(this)"/> <b style="font-size:.85em;color:#CD5C5C;">download all</b><br/></div>
+			</div>
+
 		</div>
 		<div class="span3">
 			<div class="add"><i class="icon-plus-sign"></i><a href="JavaScript:newPopup('http://127.0.0.1:8000/addcorpus/');">new corpus</a></div>
@@ -180,7 +212,7 @@ function newPopup(url) {
 
 	<div class="row-fluid" id="separator"> </div>
 
-	<form method="post" name="download-composers" action="download.html">
+	<form method="post" name="download-corpora" action="">{% csrf_token %}
 
 	{% for corpus in content %}
 	<div class="row-fluid">
@@ -204,7 +236,7 @@ function newPopup(url) {
 	{% endfor %}
 
 <div class="row-fluid" id="submit-row">
-<button type="submit" value="Download" class="btn btn-primary">Download and save</button>
+<button type="submit" value="Download" class="btn btn-primary">Download and save</button>{% csrf_token %}
 </form>
 </div>
 

@@ -83,7 +83,7 @@
                         </ul>
                         <p class="navbar-text pull-right">
                             {% with downloads="/downloads/" %}
-                            <a href="downloads"><i class="icon-download"></i></a>
+                            <a href="{{downloads}}"><i class="icon-download"></i></a>
                             {% endwith %}
                             <a href="#">Login</a>
                         </p>
@@ -105,7 +105,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td><a class="model-link" href="{{upload}}">Upload</a></td>
+                            <td><a class="model-link" href="{{upload}}">Add content</a></td>
                         </tr>
                         {% endwith %}{% endwith %}
                     </table>

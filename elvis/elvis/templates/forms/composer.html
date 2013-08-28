@@ -4,7 +4,7 @@ body {
 	background-color:#FFF8DC;
 	font-family:sans-serif;
 }
-
+ 
 #header {
 	background-color:#ADD8E6;
 }
@@ -101,6 +101,10 @@ body {
     <br><br>
 
 {% if form.errors %} {{ form.errors }}
+<div class="submit">
+    {% csrf_token %}
+    <button type="submit" value="Download" class="btn btn-primary">Add composer</button>
+	</div>
 {% else %}
     <div class="submit">
     {% csrf_token %}

@@ -92,6 +92,10 @@ body {
     <br><br>
 
 {% if form.errors %} {{ form.errors }}
+<div class="submit">
+    {% csrf_token %}
+    <button type="submit" value="Download" class="btn btn-primary">Add corpus</button>
+	</div>
 {% else %}
     <div class="submit">
     {% csrf_token %}
