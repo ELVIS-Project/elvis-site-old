@@ -1,6 +1,4 @@
 from django.db import models
-from datetime import datetime
-
 from django.contrib.auth.models import User
 
 class Todo(models.Model):
@@ -10,8 +8,8 @@ class Todo(models.Model):
     assigned_to = models.ForeignKey(User, blank=True, null=True)
     due_date = models.DateField(blank=True, null=True)
 
-    created = models.DateTimeField(default=datetime.now, blank=True)
-
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
         return u"{0}".format(self.project)

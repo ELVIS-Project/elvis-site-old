@@ -138,10 +138,10 @@ function handler(sort_name){
 	<div class="row-fluid">
 		<div class="span5">
 		{% if content %}
-			{% if content|length = 1 %}
+			{% if content.paginator.count = 1 %}
 				<h4> 1 movement found </h4>
 			{% else %}
-			<h4> {{ content|length }} movements found </h4>
+			<h4> {{ content.paginator.count }} movements found </h4>
 			{% endif %}
 		</div>
 		<div class="span3">
@@ -196,6 +196,22 @@ function handler(sort_name){
 <button type="submit" value="Download" class="btn btn-primary">Download and save</button>{% csrf_token %}
 </form>
 </div> 
+
+<div class="pagination">  
+  <ul> 
+  	{% if content.has_previous %}
+    <li><a href="?page={{ content.previous_page_number }}">Previous</a></li>  
+    {% endif %}
+
+    {% for page_num in content.paginator.page_range|truncate:10 %}
+    <li class="active"> <a href="?page={{page_num}}">{{page_num}}</a>  </li>  
+    {% endfor %}
+
+    {% if content.has_next %}
+    <li><a href="?page={{ content.next_page_number }}">Next</a></li>
+    {% endif %}
+  </ul>  
+</div>  
 
 {% else %}
 	<h4>Sorry, no movements were found.</h4>

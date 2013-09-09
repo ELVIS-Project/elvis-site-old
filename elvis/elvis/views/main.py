@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.db.models import Q
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.contrib.auth.models import User
 from elvis.models.attachment import Attachment
@@ -37,7 +38,11 @@ MODELS = get_models(dir(elvis.models))
 MODEL_INFO = model_dict(MODELS)
 '''
 
-USER = User.objects.get(pk=40)
+# USER = User.objects.get(pk=40)
+USER = None
+
+# Default number of results per page. Used for pagination 
+RESULT_PER_PAGE = 25
 
 # Render the home page 
 def home(request):
@@ -296,16 +301,31 @@ def sort_objects(object_name, val):
     else:
         return object_name.objects.all().order_by(val)
 
+# Utility method to paginate a query set 
+def paginate(objects, GET, num=RESULT_PER_PAGE):
+    paginator = Paginator(objects, num)
+    page = GET.get("page")
+    try:
+        object_list = paginator.page(page)
+    except PageNotAnInteger:
+        object_list = paginator.page(1)
+    except EmptyPage:
+        object_list = paginator.page(paginator.num_pages)
+    return object_list
+
 def corpora_list(request):
     val = None
     if request.method == "POST":
         val = request.POST.get('sorting')
         save_corpus(request.POST.getlist('save-items'))
-    corpora = sort_objects(Corpus, val)
+
+    corpora = paginate(sort_objects(Corpus, val), request.GET)
+
     if val == u'most':
         corp = map(lambda corpus:(Piece.objects.filter(corpus_id=corpus.id).count(), corpus), corpora)
         corp.sort()
-        corpora = [c[1] for c in corp]
+        corpora = paginate([c[1] for c in corp], request.GET)
+
     return render(request, 'corpus/corpus_list.html', {"content":corpora})
 
 def corpora_list_min(request):
@@ -313,13 +333,17 @@ def corpora_list_min(request):
     if request.method == "POST":
         val = request.POST.get('sorting')
         save_corpus(request.POST.getlist('save-items'))
-    corpora = sort_objects(Corpus, val)
+
+    corpora = paginate(sort_objects(Corpus, val), request.GET)
+
     if val == u'most':
         corp = map(lambda corpus:(Piece.objects.filter(corpus_id=corpus.id).count(), corpus), corpora)
         corp.sort()
-        corpora = [c[1] for c in corp]
+        corpora = paginate([c[1] for c in corp], request.GET)
+
     return render(request, 'corpus/corpus_list_min.html', {"content":corpora})
 
+# TODO: when sort value = most
 def composer_list(request):
     val = None
     if request.method == "POST":
@@ -327,8 +351,10 @@ def composer_list(request):
         save_composer(request.POST.getlist('save-items'))
     if val == u'most':
         comp = []
-    composers = sort_objects(Composer, val)
+
+    composers = paginate(sort_objects(Composer, val), request.GET)
     pieces = {}
+
     for composer in composers:
         p = map(lambda x:x.title, list(Piece.objects.filter(composer_id=composer.id)))[:15]
         if val == u'most':
@@ -337,12 +363,16 @@ def composer_list(request):
             pieces[composer.id] = ', '.join(p)+'...'
         else:
             pieces[composer.id] = ''
+
     if val == u'most':
         comp.sort(reverse=True)
-        composers = [c[1] for c in comp]
+        composers = paginate([c[1] for c in comp], request.GET)
+
     context = {"content": composers, "pieces":pieces }
+
     return render(request, 'composer/composer_list.html', context)
 
+# TODO: when sort value = most
 def composer_list_min(request):
     val = None
     if request.method == "POST":
@@ -350,11 +380,15 @@ def composer_list_min(request):
         save_composer(request.POST.getlist('save-items'))
     if val == u'most':
         comp = []
-    composers = sort_objects(Composer, val)
+
+    composers = paginate(sort_objects(Composer, val), request.GET)
+
     if val == u'most':
         comp.sort(reverse=True)
-        composers = [c[1] for c in comp]
+        composers = paginate([c[1] for c in comp], request.GET)
+
     context = {"content": composers }
+
     return render(request, 'composer/composer_list_min.html', context)
 
 def piece_list(request):
@@ -362,7 +396,9 @@ def piece_list(request):
     if request.method == "POST":
         val = request.POST.get('sorting')
         save_pieces(request.POST.getlist('save-pieces'))
-    pieces = sort_objects(Piece, val)
+
+    pieces = paginate(sort_objects(Piece, val), request.GET, num=40)
+
     return render(request, 'piece/piece_list.html', {"content": pieces})
 
 def movement_list(request):
@@ -370,7 +406,9 @@ def movement_list(request):
     if request.method == "POST":
         val = request.POST.get('sorting')
         save_movements(request.POST.getlist('save-movements'))
-    movements = sort_objects(Movement, val)
+
+    movements = paginate(sort_objects(Movement, val), request.GET, num=40)
+
     return render(request, 'movement/movement_list.html', {"content":movements})
 
 # Download has attachment associated with either piece or movement
@@ -379,7 +417,9 @@ def download_list(request):
         dl_ids = request.POST.getlist('download-item')
         for dl_id in dl_ids:
             Download.objects.get(pk=int(str(dl_id))).delete()
-    downloads = Download.objects.all()
+
+    downloads = paginate(Download.objects.all(), request.GET, num=40)
+
     return render(request, 'download/download_list.html', {"content": downloads})
 
 '''
@@ -421,17 +461,19 @@ def save_movements(movements):
         for movement in movements:
             save_movement(movement)
 
-def save_corpus(corpus):
-    if corpus:
-        pieces = Piece.objects.filter(corpus_id=int(corpus))
-        for piece in pieces:
-            save_piece(piece.id)
+def save_corpus(corpora):
+    if corpora:
+        for corpus in corpora:
+            pieces = Piece.objects.filter(corpus_id=int(corpus))
+            for piece in pieces:
+                save_piece(piece.id)
 
-def save_composer(composer):
-    if composer:
-        pieces = Piece.objects.filter(composer_id=int(composer))
-        for piece in pieces:
-            save_piece(piece.id)
+def save_composer(composers):
+    if composers:
+        for composer in composers:
+            pieces = Piece.objects.filter(composer_id=int(composer))
+            for piece in pieces:
+                save_piece(piece.id)
 
 '''
 MODEL DETAILS

@@ -170,10 +170,10 @@ function downloadAll(source) {
 	<div class="row-fluid" id="header-row">
 		<div class="span5">
 		{% if content %}
-			{% if content|length = 1 %}
+			{% if content.paginator.count = 1 %}
 				<h4> 1 composer found </h4>
 			{% else %}
-			<h4> {{ content|length }} composers found </h4>
+			<h4> {{ content.paginator.count }} composers found </h4>
 			{% endif %}
 
 			<div class="row-fluid">
@@ -187,8 +187,7 @@ function downloadAll(source) {
 		<div class="span3">
 			{% with c='/addcomposer/' %}
 			<div class="add">
-				<i class="icon-plus-sign"></i>
-				<a href="JavaScript:newPopup('http://127.0.0.1:8000/addcomposer/');">new composer</a>
+				<i class="icon-plus-sign"></i><a href="JavaScript:newPopup('http://127.0.0.1:8000/addcomposer/');">new composer</a>
 			</div>
 			{% endwith %}
 		</div>
@@ -240,6 +239,23 @@ function downloadAll(source) {
 <button type="submit" value="Download" class="btn btn-primary">Download and save</button>{% csrf_token %}
 </form>
 </div> 
+
+<div class="pagination">  
+  <ul> 
+  	{% if content.has_previous %}
+    <li><a href="?page={{ content.previous_page_number }}">Previous</a></li>  
+    {% endif %}
+
+    {% for page_num in content.paginator.page_range|truncate:10 %}
+    <li class="active"> <a href="?page={{page_num}}">{{page_num}}</a>  </li>  
+    {% endfor %}
+
+    {% if content.has_next %}
+    <li><a href="?page={{ content.next_page_number }}">Next</a></li>
+    {% endif %}
+  </ul>  
+</div>  
+
 
 {% else %}
 	<h4> Sorry, no composers were found. </h4>

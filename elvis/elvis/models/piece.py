@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-from datetime import datetime
 
 class Piece(models.Model):
     old_id = models.IntegerField(db_index=True, blank=True, null=True)
@@ -18,10 +17,8 @@ class Piece(models.Model):
     number_of_queries = models.IntegerField(blank=True, null=True)
     number_of_downloads = models.IntegerField(blank=True, null=True)
 
-    #created = models.DateTimeField(auto_now_add=True)
-    #updated = models.DateTimeField(auto_now=True)
-    created = models.DateTimeField(default=datetime.now, blank=True)
-    updated = models.DateTimeField(default=datetime.now, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
         return u"{0}".format(self.title)
